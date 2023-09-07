@@ -157,7 +157,11 @@ ANNt_order <- function(Initial_Date_Training, Final_Date_Training, Final_Date_Te
                        hidden = escondida, act.fct = "tanh", threshold = 0.01,
                        stepmax=epocas)
 
+    if (ativo==2){
     colnames(entradas)[1]=colnames(dat_r[ativo-1])
+    } else {
+      colnames(entradas)[1]=colnames(dat_r[ativo])
+    }
     View(entradas)
 
     arquivo = colnames(entradas)[1]
@@ -752,83 +756,107 @@ ANNt_order <- function(Initial_Date_Training, Final_Date_Training, Final_Date_Te
   ################################################################################
   ################################################################################
 
-  ## Train
-  order(ResProbPosNNet)
-  Test <- sort(ResProbPosNNet, decreasing=TRUE)
-
-  ResProbPosNNEtx <- t(Test)
-  ResProbPosNNEtx <- data.frame(ResProbPosNNEtx)
-  TesteNNet <- ResProbPosNNEtx %>% dplyr::filter(ResProbPosNNEtx > 0.0)
-
-  TesteNNet <- t(TesteNNet)
-  ###
-
-  order(ResProbPos)
-  Test2 <- sort(ResProbPos, decreasing=TRUE)
-
-  ResProbPosx <- t(Test2)
-  ResProbPosx <- data.frame(ResProbPosx)
-  TestePos <- ResProbPosx %>% dplyr::filter(ResProbPosx>0.0)
-  TestePos <- t(TestePos)
-  ###
-
-  order(ResProbTPosNNet)
-  TestT <- sort(ResProbTPosNNet, decreasing=TRUE)
-
-  ResProbTPosNNEtx <- t(TestT)
-  ResProbTPosNNEtx <- data.frame(ResProbTPosNNEtx)
-  TesteTNNet <- ResProbTPosNNEtx %>% dplyr::filter(ResProbTPosNNEtx>0.0)
-  #TesteTNNet <- filter(ResProbTPosNNEtx, ResProbTPosNNEtx>0.5)
-  TesteTNNet <- t(TesteTNNet)
+  ## Train NNet
+  order(as.matrix(ResProbPosNNet))
+  nomes = colnames(ResProbPosNNet)
+  prob = t(ResProbPosNNet)
+  Res=as.matrix(ResProbPosNNet)
+  Res2 = data.frame(Nomes=nomes,Prob=Res[1,])
+  Test = arrange(Res2, desc(Prob))
+  TesteNNet= matrix(data=ncol(ResProbPosNNet):1, nrow=1, ncol=ncol(ResProbPosNNet))
+  colnames(TesteNNet)= Test$Nomes
+  TesteNNet[1,]=Test$Prob
 
   ###
-  order(ResProbTPos)
-  Test2T <- sort(ResProbTPos, decreasing=TRUE)
 
-  ResProbTPosx <- t(Test2T)
-  ResProbTPosx <- data.frame(ResProbTPosx)
-  TesteTPos <- ResProbTPosx %>% dplyr::filter(ResProbTPosx>0.0)
-  TesteTPos <- t(TesteTPos)
+  order(as.matrix(ResProbPos))
+  nomes = colnames(ResProbPos)
+  prob = t(ResProbPos)
+  Res=as.matrix(ResProbPos)
+  Res2 = data.frame(Nomes=nomes,Prob=Res[1,])
+  Test = arrange(Res2, desc(Prob))
+  TestePos= matrix(data=ncol(ResProbPos):1, nrow=1, ncol=ncol(ResProbPos))
+  colnames(TestePos)= Test$Nomes
+  TestePos[1,]=Test$Prob
+
+  ###
+
+  order(as.matrix(ResProbTPosNNet))
+  nomes = colnames(ResProbTPosNNet)
+  prob = t(ResProbTPosNNet)
+  Res=as.matrix(ResProbTPosNNet)
+  Res2 = data.frame(Nomes=nomes,Prob=Res[1,])
+  Test = arrange(Res2, desc(Prob))
+  TesteTNNet= matrix(data=ncol(ResProbTPosNNet):1, nrow=1, ncol=ncol(ResProbTPosNNet))
+  colnames(TesteTNNet)= Test$Nomes
+  TesteTNNet[1,]=Test$Prob
+
+  ###
+
+  order(as.matrix(ResProbTPos))
+  nomes = colnames(ResProbTPos)
+  prob = t(ResProbTPos)
+  Res=as.matrix(ResProbTPos)
+  Res2 = data.frame(Nomes=nomes,Prob=Res[1,])
+  Test = arrange(Res2, desc(Prob))
+  TesteTPos= matrix(data=ncol(ResProbTPos):1, nrow=1, ncol=ncol(ResProbTPos))
+  colnames(TesteTPos)= Test$Nomes
+  TesteTPos[1,]=Test$Prob
+
 
   ###
   ### Test
-  order(ResProbPosNNetPredict)
-  TestPredict <- sort(ResProbPosNNetPredict, decreasing=TRUE)
 
-  ResProbPosNNEtxPredict <- t(TestPredict)
-  ResProbPosNNEtxPredict <- data.frame(ResProbPosNNEtxPredict)
-  TesteNNetPredict <- ResProbPosNNEtxPredict %>%
-    dplyr::filter(ResProbPosNNEtxPredict>0.0)
-  TesteNNetPredict <- t(TesteNNetPredict)
+  order(as.matrix(ResProbPosNNetPredict))
+  nomes = colnames(ResProbPosNNetPredict)
+  prob = t(ResProbPosNNetPredict)
+  Res=as.matrix(ResProbPosNNetPredict)
+  Res2 = data.frame(Nomes=nomes,Prob=Res[1,])
+  Test = arrange(Res2, desc(Prob))
+  TesteNNetPredict= matrix(data=ncol(ResProbPosNNetPredict):1, nrow=1, ncol=ncol(ResProbPosNNetPredict))
+  colnames(TesteNNetPredict)= Test$Nomes
+  TesteNNetPredict[1,]=Test$Prob
+
   ###
 
-  order(ResProbPosPredict)
-  Test2Predict <- sort(ResProbPosPredict, decreasing=TRUE)
 
-  ResProbPosxPredict <- t(Test2Predict)
-  ResProbPosxPredict <- data.frame(ResProbPosxPredict)
-  TestePosPredict <- ResProbPosxPredict %>% dplyr::filter(ResProbPosxPredict>0.0)
-  TestePosPredict <- t(TestePosPredict)
+  order(as.matrix(ResProbPosPredict))
+  nomes = colnames(ResProbPosPredict)
+  prob = t(ResProbPosPredict)
+  Res=as.matrix(ResProbPosPredict)
+  Res2 = data.frame(Nomes=nomes,Prob=Res[1,])
+  Test = arrange(Res2, desc(Prob))
+  TestePosPredict= matrix(data=ncol(ResProbPosPredict):1, nrow=1, ncol=ncol(ResProbPosPredict))
+  colnames(TestePosPredict)= Test$Nomes
+  TestePosPredict[1,]=Test$Prob
+
   ###
 
-  order(ResProbTPosNNetPredict)
-  TestTPredict <- sort(ResProbTPosNNetPredict, decreasing=TRUE)
 
-  ResProbTPosNNEtxPredict <- t(TestTPredict)
-  ResProbTPosNNEtxPredict <- data.frame(ResProbTPosNNEtxPredict)
-  TesteTNNetPredict <- ResProbTPosNNEtxPredict %>%
-    dplyr::filter(ResProbTPosNNEtxPredict>0.0)
-  #TesteTNNetPredict<-filter(ResProbTPosNNEtxPredict, ResProbTPosNNEtxPredict>0.5)
-  TesteTNNetPredict <- t(TesteTNNetPredict)
+  order(as.matrix(ResProbTPosNNetPredict))
+  nomes = colnames(ResProbTPosNNetPredict)
+  prob = t(ResProbTPosNNetPredict)
+  Res=as.matrix(ResProbTPosNNetPredict)
+  Res2 = data.frame(Nomes=nomes,Prob=Res[1,])
+  Test = arrange(Res2, desc(Prob))
+  TesteTNNetPredict= matrix(data=ncol(ResProbTPosNNetPredict):1, nrow=1, ncol=ncol(ResProbTPosNNetPredict))
+  colnames(TesteTNNetPredict)= Test$Nomes
+  TesteTNNetPredict[1,]=Test$Prob
+
   ###
   #### RNA-t Particular para armazenar em T8
-  order(ResProbTPosPredict)
-  Test2TPredict <- sort(ResProbTPosPredict, decreasing=TRUE)
 
-  ResProbTPosxPredict <- t(Test2TPredict)
-  ResProbTPosxPredict <- data.frame(ResProbTPosxPredict)
-  TesteTPosPredict <- ResProbTPosxPredict %>% dplyr::filter(ResProbTPosxPredict>0.0)
-  TesteTPosPredict <- t(TesteTPosPredict)
+  order(as.matrix(ResProbTPosPredict))
+  nomes = colnames(ResProbTPosPredict)
+  prob = t(ResProbTPosPredict)
+  Res=as.matrix(ResProbTPosPredict)
+  Res2 = data.frame(Nomes=nomes,Prob=Res[1,])
+  Test = arrange(Res2, desc(Prob))
+  TesteTPosPredict= matrix(data=ncol(ResProbTPosPredict):1, nrow=1, ncol=ncol(ResProbTPosNNetPredict))
+  colnames(TesteTPosPredict)= Test$Nomes
+  TesteTPosPredict[1,]=Test$Prob
+
+
 
   ###
   #T1=data.frame(TesteNNet)   #Resultado Sinal Positivo - NeuralNet Ordenada Train
