@@ -39,7 +39,7 @@ Assets_series <- function(Tickers, RM, Initial_Date, Final_Date) {
   install.packages("ggplot2")
   install.packages("rvest")
   install.packages("caret")
-  install.package ("readxl")
+  install.packages("readxl")
   install.packages("writexl")
   install.packages("portfolio.optimization")
   install.packages("PortfolioAnalytics")
