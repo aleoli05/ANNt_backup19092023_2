@@ -2,9 +2,7 @@
 % Please edit documentation in R/Assets_series.R
 \name{Assets_series}
 \alias{Assets_series}
-\title{ANNt
-Generate portfolios with classification by the probability of return exceeding a RM,
-using artificial neural networks and t-distribution.}
+\title{Import the series}
 \usage{
 Assets_series(Tickers, RM, Initial_Date, Final_Date)
 }
@@ -14,14 +12,12 @@ Assets_series(Tickers, RM, Initial_Date, Final_Date)
 \item{RM}{Proxy of the market}
 
 \item{Final_Date}{Series end Date ('Year-Month-Day')
-Assets with values not observedin the series are excluded}
+Assets with values not observed in the series are excluded}
 
 \item{Inicial_Date}{Series start Date, format ('Year-Month-Day')}
 }
 \description{
-ANNt
-Generate portfolios with classification by the probability of return exceeding a RM,
-using artificial neural networks and t-distribution.
+Import the series
 }
 \examples{
 # Specify the assets or "Current_SP500_Tickers" for all S&P 500 assets
@@ -31,6 +27,6 @@ Initial_Date <-c('2018-01-03')
 Final_Date <-c('2023-09-07')
 
 # Generates the Adjusted Daily Prices Series from Yahoo Finance
-Assets_series (Tickers=c('AAPL','GOOG','CCBG','XOM','TSLA'),'^GSPC', '2018-01-03', '2023-01-09')
+Assets_series (Tickers=c('AAPL','GOOG','CCBG','XOM','TSLA'),'^GSPC', '2018-01-03', '2023-09-07')
 
 }

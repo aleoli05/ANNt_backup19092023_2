@@ -102,8 +102,10 @@ ANNt_order <- function(Initial_Date_Training, Final_Date_Training, Final_Date_Te
     #Envelope
 
     # Calculo das defasagens para cada ativo
-    dat_r <- data.frame(dados[,ativo], Lag(dados[,1],1))
+    dados2=data.frame(dados)
+    dat_r <- data.frame(dados2[ativo], Lag(dados[,1],1))
     colnames(dat_r)[2]="RM"
+
     defasagem = 5
     for (i in 1:defasagem){
       dat_r[i+2] = Lag(dat_r[1],i)
@@ -158,7 +160,7 @@ ANNt_order <- function(Initial_Date_Training, Final_Date_Training, Final_Date_Te
                        stepmax=epocas)
 
 
-    colnames(entradas)[1]=colnames(dados[,ativo])
+    colnames(entradas)[1]=colnames(dados2[ativo])
 
     View(entradas)
 
@@ -245,11 +247,11 @@ ANNt_order <- function(Initial_Date_Training, Final_Date_Training, Final_Date_Te
     if (mean(prev)>0) {
       ProbabilidadeTmedia =pt(0.0,
                               df=length(prev)-1,ncp = se, lower.tail=FALSE)
-      cat("Densidade Assimetrica ? Direita (Negativa)")
+      cat("Right asymmetric density (Negative)")
     } else {
       ProbabilidadeTmedia =pt(0.0,
                               df=length(prev)-1,ncp = -se, lower.tail=FALSE)
-      cat("Densidade Assimetrica ? Esquerda (Positiva)")
+      cat("Left asymmetric density (Positive)")
     }
     #ProbabilidadeTmedia =pt(mean(prev),
     #                    df=length(prev)-1,lower.tail=TRUE)
@@ -386,7 +388,7 @@ ANNt_order <- function(Initial_Date_Training, Final_Date_Training, Final_Date_Te
     #png(file = "leptokurtic.png")
 
     if (kurtosis(camadaSaida)>3) {
-      print("Curtose da curva Leptoc?rtica:")
+      print("Leptokutic curve kurtosis:")
       print(kurtosis(camadaSaida))
     }
     t = 3.373 # p =0.1
@@ -403,11 +405,11 @@ ANNt_order <- function(Initial_Date_Training, Final_Date_Training, Final_Date_Te
     if (mean(camadaSaida)>0) {
       ProbabilidadeTmedia =pt(0.0,
                               df=length(camadaSaida)-1,ncp = se, lower.tail=FALSE)
-      cat("Densidade Assimetrica ? Direita (Negativa)")
+      cat("Right asymmetric density (Negative)")
     } else {
       ProbabilidadeTmedia =pt(0.0,
                               df=length(camadaSaida)-1,ncp = -se, lower.tail=FALSE)
-      cat("Densidade Assim?trica ? Esquerda (Positiva)")
+      cat("Left asymmetric density (Positive)")
     }
     #ProbabilidadeTmedia =pt(mean(camadaSaida),
     #                 df=length(camadaSaida)-1, lower.tail = TRUE)
@@ -576,12 +578,12 @@ ANNt_order <- function(Initial_Date_Training, Final_Date_Training, Final_Date_Te
       ProbabilidadeTmedia =pt(0.0,
                               df=length(prevPredict)-1,ncp = se,
                               lower.tail=FALSE)
-      cat("Densidade Assimetrica ? Direita (Negativa)")
+      cat("Right asymmetric density (Negative)")
     } else {
       ProbabilidadeTmedia =pt(0.0,
                               df=length(prevPredict)-1,ncp = -se,
                               lower.tail=FALSE)
-      cat("Densidade Assimetrica ? Esquerda (Positiva)")
+      cat("Left asymmetric density (Positive)")
     }
     #ProbabilidadeTmedia =pt(mean(prev),
     #                    df=length(prev)-1,lower.tail=TRUE)
@@ -623,7 +625,7 @@ ANNt_order <- function(Initial_Date_Training, Final_Date_Training, Final_Date_Te
     #png(file = "leptokurtic.png")
 
     if (kurtosis(camadaSaidaPredict)>3) {
-      print("Curtose da curva Leptoc?rtica:")
+      print("Leptokurtic curve kurtosis:")
       print(kurtosis(camadaSaidaPredict))
     }
     t = 3.373 # p =0.1
@@ -641,12 +643,12 @@ ANNt_order <- function(Initial_Date_Training, Final_Date_Training, Final_Date_Te
       ProbabilidadeTmedia =pt(0.0,
                               df=length(camadaSaidaPredict)-1,ncp = se,
                               lower.tail=FALSE)
-      cat("Densidade Assimetrica ? Direita (Negativa)")
+      cat("Right asymmetric density (Negative)")
     } else {
       ProbabilidadeTmedia =pt(0.0,
                               df=length(camadaSaidaPredict)-1,ncp = -se,
                               lower.tail=FALSE)
-      cat("Densidade Assim?trica ? Esquerda (Positiva)")
+      cat("Left asymmetric density (Positive)")
     }
     #ProbabilidadeTmedia =pt(mean(camadaSaida),
     #                 df=length(camadaSaida)-1, lower.tail = TRUE)

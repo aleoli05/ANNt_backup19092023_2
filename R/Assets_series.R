@@ -1,12 +1,10 @@
-#' ANNt
-#' Generate portfolios with classification by the probability of return exceeding a RM,
-#' using artificial neural networks and t-distribution.
+#' Import the series
 #' @export
 #' @param Tickers Name of the assets or "Current_SP500_Tickers" for all S&P 500 assets
 #' @param RM Proxy of the market
 #' @param Inicial_Date Series start Date, format ('Year-Month-Day')
 #' @param Final_Date Series end Date ('Year-Month-Day')
-#' Assets with values not observedin the series are excluded
+#' Assets with values not observed in the series are excluded
 
 #' @examples
 #' # Specify the assets or "Current_SP500_Tickers" for all S&P 500 assets
@@ -16,40 +14,10 @@
 #' Final_Date <-c('2023-09-07')
 #'
 #' # Generates the Adjusted Daily Prices Series from Yahoo Finance
-#' Assets_series (Tickers=c('AAPL','GOOG','CCBG','XOM','TSLA'),'^GSPC', '2018-01-03', '2023-01-09')
+#' Assets_series (Tickers=c('AAPL','GOOG','CCBG','XOM','TSLA'),'^GSPC', '2018-01-03', '2023-09-07')
 #'
 Assets_series <- function(Tickers, RM, Initial_Date, Final_Date) {
 
-  # library(webinar.cpom)
-  install.packages("quantmod")
-  install.packages("PerformanceAnalytics")
-  install.packages("magrittr")
-  install.packages("fBasics")
-  install.packages("tidyverse")
-  install.packages("stringr")
-  install.packages("dplyr")
-  install.packages("neuralnet")
-  install.packages("zoo")
-  install.packages("forecast")
-  install.packages("timetk")
-  install.packages("moments")
-  install.packages("data.table")
-  install.packages("ggplot2")
-  install.packages("rvest")
-  install.packages("caret")
-  install.packages("readxl")
-  install.packages("writexl")
-  install.packages("portfolio.optimization")
-  install.packages("PortfolioAnalytics")
-  install.packages("ROI")
-  install.packages("fPortfolio")
-  install.packages("timeSeries")
-  install.packages("gridExtra")
-  install.packages("cowplot")
-  install.packages("portfolioBacktest")
-  install.packages("CVXR")
-  install.packages("MFDFA")
-  install.packages("DEoptim")
 
   library(quantmod)
   library(PerformanceAnalytics)
@@ -162,7 +130,7 @@ Assets_series <- function(Tickers, RM, Initial_Date, Final_Date) {
   tickers <- str_replace(tickers,"^G","G")
   colnames(portfolioPrices) <- tickers
   colnames(portfolioPrices)[1] <- RM
-
+  colnames(portfolio_observed)[1] <- RM
 
   #View(portfolioPrices)
 
@@ -194,7 +162,8 @@ Assets_series <- function(Tickers, RM, Initial_Date, Final_Date) {
   View(Assets_Returns)
   #write_xlsx(tickers,file='~/tickers.xlsx')
   write_xlsx(portfolioPrices_Df, "~/Assets_Prices.xlsx")
-  write_xlsx(portfolio_observed, "~/Assets_Prices_Observed.xlsx")
+  portfolio_observed2=data.frame(portfolio_observed)
+  write_xlsx(portfolio_observed2, "~/Assets_Prices_Observed.xlsx")
   scenario.set2=data.frame(scenario.set)
   write_xlsx(scenario.set2, "~/Assets_Returns.xlsx")
   write_xlsx(sp500tickers, "~/Current_SP500_Tickers.xlsx")
@@ -202,8 +171,8 @@ Assets_series <- function(Tickers, RM, Initial_Date, Final_Date) {
   # Plot Charts
   cat("\n", paste0(names(scenario.set), "\n"))
 
-  chart.Bar(scenario.set$SP500)
-  charts.PerformanceSummary(scenario.set$SP500)
+  chart.Bar(scenario.set[,1])
+  charts.PerformanceSummary(scenario.set[,1])
 
   #########################################
 }
