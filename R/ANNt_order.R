@@ -157,11 +157,9 @@ ANNt_order <- function(Initial_Date_Training, Final_Date_Training, Final_Date_Te
                        hidden = escondida, act.fct = "tanh", threshold = 0.01,
                        stepmax=epocas)
 
-    if (ativo==2){
-    colnames(entradas)[1]=colnames(dat_r[ativo-1])
-    } else {
-      colnames(entradas)[1]=colnames(dat_r[ativo])
-    }
+
+    colnames(entradas)[1]=colnames(dados[ativo])
+
     View(entradas)
 
     arquivo = colnames(entradas)[1]
