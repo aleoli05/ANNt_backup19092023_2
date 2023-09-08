@@ -147,18 +147,18 @@ ANNt_order <- function(Initial_Date_Training, Final_Date_Training, Final_Date_Te
     }
     colnames(entradas)[1]= "ATIVO"
     nn= neuralnet( ATIVO ~ RM + V3 + V4 + V5 + V6 + V7, data=entradas,
-                   hidden = nlinhas, act.fct = "tanh", threshold = 0.01,
+                   hidden = nlinhas, act.fct = "tanh", threshold = 0.1,
                    stepmax=epocas)
     # Plotagem da RNA
     if(nlinhas %% 2 == 0) {
       escondida = nlinhas
     } else {escondida =nlinhas+1}
     nnplot= neuralnet( ATIVO ~ RM + V3 + V4 + V5 + V6 + V7, data=entradas,
-                       hidden = escondida, act.fct = "tanh", threshold = 0.01,
+                       hidden = escondida, act.fct = "tanh", threshold = 0.1,
                        stepmax=epocas)
 
 
-    colnames(entradas)[1]=colnames(dados[ativo])
+    colnames(entradas)[1]=colnames(dados[,ativo])
 
     View(entradas)
 
@@ -878,6 +878,7 @@ ANNt_order <- function(Initial_Date_Training, Final_Date_Training, Final_Date_Te
 
   save(T8,file='~/Assets_ANNt_Order.rda')
 View(T8)
+  save(T8,file='~/T9.rda')
 write_xlsx(T8, "~/Assets_ANNt_Order.xlsx")
   ###############################
 }

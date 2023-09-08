@@ -13,11 +13,10 @@ Assets_series(Tickers, RM, Initial_Date, Final_Date)
 
 \item{RM}{Proxy of the market}
 
-\item{Final_Date}{Series end Date
-#If the generating series is smaller than the specified one, it means that one of the assets has
-#a shorter length than the specified one}
+\item{Final_Date}{Series end Date ('Year-Month-Day')
+Assets with values not observedin the series are excluded}
 
-\item{Inicial_Date}{Series start Date}
+\item{Inicial_Date}{Series start Date, format ('Year-Month-Day')}
 }
 \description{
 ANNt
@@ -29,7 +28,7 @@ using artificial neural networks and t-distribution.
 Tickers <-c('AAPL','GOOG','CCBG', 'XOM', 'TSLA')
 RM <-c('^GSPC') #RM the S&P500
 Initial_Date <-c('2018-01-03')
-Final_Date <-c('2023-01-09')
+Final_Date <-c('2023-09-07')
 
 # Generates the Adjusted Daily Prices Series from Yahoo Finance
 Assets_series (Tickers=c('AAPL','GOOG','CCBG','XOM','TSLA'),'^GSPC', '2018-01-03', '2023-01-09')

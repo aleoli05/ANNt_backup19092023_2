@@ -4,18 +4,16 @@
 #' @export
 #' @param Tickers Name of the assets or "Current_SP500_Tickers" for all S&P 500 assets
 #' @param RM Proxy of the market
-#' @param Inicial_Date Series start Date
-# @param Date_Traning Series finish training date
-#' @param Final_Date Series end Date
-#' #If the generating series is smaller than the specified one, it means that one of the assets has
-#' #a shorter length than the specified one
+#' @param Inicial_Date Series start Date, format ('Year-Month-Day')
+#' @param Final_Date Series end Date ('Year-Month-Day')
+#' Assets with values not observedin the series are excluded
 
 #' @examples
 #' # Specify the assets or "Current_SP500_Tickers" for all S&P 500 assets
 #' Tickers <-c('AAPL','GOOG','CCBG', 'XOM', 'TSLA')
 #' RM <-c('^GSPC') #RM the S&P500
 #' Initial_Date <-c('2018-01-03')
-#' Final_Date <-c('2023-01-09')
+#' Final_Date <-c('2023-09-07')
 #'
 #' # Generates the Adjusted Daily Prices Series from Yahoo Finance
 #' Assets_series (Tickers=c('AAPL','GOOG','CCBG','XOM','TSLA'),'^GSPC', '2018-01-03', '2023-01-09')
@@ -131,6 +129,7 @@ Assets_series <- function(Tickers, RM, Initial_Date, Final_Date) {
 
   # Salve SP500 in excel
   colnames(portfolioPrices) <- str_replace(tickers,".Close","")
+  colnames(portfolioPrices) <- str_replace(tickers,".Adjusted","")
   portfolioPrices_Teste = portfolioPrices
 
 
@@ -139,10 +138,20 @@ Assets_series <- function(Tickers, RM, Initial_Date, Final_Date) {
                               as.data.frame(portfolioPrices))
 
 
-  portfolioPrices <- portfolioPrices[apply(portfolioPrices,1,
+  df=t(portfolioPrices)
+  df2=df[apply(df,1,function(x) all(!is.na(x))),]
+  df3<-t(df2)
+
+
+  portfolio_observed <- df3[apply(df3,1,
                                            function(x) all(!is.na(x))),]
-  portfolioPrices <- portfolioPrices[apply(portfolioPrices,1,
+  portfolio_observed <- df3[apply(df3,1,
                                            function(x) all(!0)),]
+
+ # portfolioPrices <- portfolioPrices[apply(portfolioPrices,1,
+ #                                             function(x) all(!is.na(x))),]
+#  portfolioPrices<- portfolioPrices[apply(portfolioPrices,1,
+  #                                           function(x) all(!0)),]
   # RM
   RM <- c("SP500")
   #Renames Columns
@@ -158,9 +167,12 @@ Assets_series <- function(Tickers, RM, Initial_Date, Final_Date) {
   #View(portfolioPrices)
 
   # Calculate Returns: Daily RoC
-  portfolioReturns <- na.omit(ROC(portfolioPrices, type="discrete"))
+
+    #portfolioReturns <- na.omit(ROC(portfolioPrices, type="discrete"))
+  portfolioReturns <- na.omit(ROC(portfolio_observed, type="discrete"))
 
   scenario.set <- portfolioReturns
+
   scenario.set <- scenario.set[apply(scenario.set,1,
                                      function(x) all(!0)),]
   #View(scenario.set)
@@ -174,12 +186,15 @@ Assets_series <- function(Tickers, RM, Initial_Date, Final_Date) {
   save(scenario.set,file='~/Assets_Returns.rda')
   save(portfolioPrices,file='~/Assets_Prices.rda')
   Assets_Prices=portfolioPrices
+  Asset_Prices_Observed=portfolio_observed
   Assets_Returns=scenario.set
   write.zoo(scenario.set, file='scenario.set')
   View(Assets_Prices)
+  View(portfolio_observed)
   View(Assets_Returns)
   #write_xlsx(tickers,file='~/tickers.xlsx')
   write_xlsx(portfolioPrices_Df, "~/Assets_Prices.xlsx")
+  write_xlsx(portfolio_observed, "~/Assets_Prices_Observed.xlsx")
   scenario.set2=data.frame(scenario.set)
   write_xlsx(scenario.set2, "~/Assets_Returns.xlsx")
   write_xlsx(sp500tickers, "~/Current_SP500_Tickers.xlsx")
