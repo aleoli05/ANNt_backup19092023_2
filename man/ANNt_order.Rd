@@ -22,9 +22,9 @@ using artificial neural networks and t-distribution
 }
 \examples{
 Initial_Date_Training <-c('2018-01-11')
-Final_Date_Training <- c('2022-12-30')
+Final_Date_Training <- c('2022-12-29')
 Final_Date_Testing <-c('2023-09-07')
-ANNt_order ('2018-01-11', '2022-12-30','2023-09-07')
+ANNt_order ('2018-01-11', '2022-12-29','2023-09-07')
 # Estimated processing time 30 minutes per asset
 
 }

@@ -2,9 +2,12 @@
 #' @export
 #' @param Tickers Name of the assets or "Current_SP500_Tickers" for all S&P 500 assets
 #' @param RM Proxy of the market
-#' @param Inicial_Date Series start Date, format ('Year-Month-Day')
-#' @param Final_Date Series end Date ('Year-Month-Day')
+#' @param Initial_Date Series start Date, format ('Year-Month-Day')
+#'
 #' Assets with values not observed in the series are excluded
+#' @param Final_Date Series end Date ('Year-Month-Day')
+#' @param Periodicity should be one of “daily”, “weekly”, “monthly”, “hourly”, “1minutes”, “2minutes”, “5minutes”, “15minutes”, “30minutes”, “60minutes”, “90minutes”
+
 
 #' @examples
 #' # Specify the assets or "Current_SP500_Tickers" for all S&P 500 assets
@@ -12,11 +15,12 @@
 #' RM <-c('^GSPC') #RM the S&P500
 #' Initial_Date <-c('2018-01-03')
 #' Final_Date <-c('2023-09-07')
+#' Periodicity <- c('daily')
 #'
 #' # Generates the Adjusted Daily Prices Series from Yahoo Finance
-#' Assets_series (Tickers=c('AAPL','GOOG','CCBG','XOM','TSLA'),'^GSPC', '2018-01-03', '2023-09-07')
+#' Assets_series (Tickers=c('AAPL','GOOG','CCBG','XOM','TSLA'),'^GSPC', '2018-01-03', '2023-09-07','daily')
 #'
-Assets_series <- function(Tickers, RM, Initial_Date, Final_Date) {
+Assets_series <- function(Tickers, RM, Initial_Date, Final_Date, Periodicity) {
 
 
   library(quantmod)
@@ -93,6 +97,7 @@ Assets_series <- function(Tickers, RM, Initial_Date, Final_Date) {
     portfolioPrices <- cbind(portfolioPrices,
                              getSymbols.yahoo(Ticker, from= Initial_Date,
                                               to= Final_Date,
+                                              periodicity= Periodicity,
                                               auto.assign=FALSE)[,6])
 
   # Salve SP500 in excel
@@ -106,29 +111,52 @@ Assets_series <- function(Tickers, RM, Initial_Date, Final_Date) {
                               as.data.frame(portfolioPrices))
 
 
-  df=t(portfolioPrices)
-  df2=df[apply(df,1,function(x) all(!is.na(x))),]
-  df3<-t(df2)
+ # df=t(portfolioPrices)
+#  df2=df[apply(df,1,function(x) all(!is.na(x))),]
+ # df3<-t(df2)
 
 
-  portfolio_observed <- df3[apply(df3,1,
-                                           function(x) all(!is.na(x))),]
-  portfolio_observed <- df3[apply(df3,1,
-                                           function(x) all(!0)),]
+  #portfolio_observed <- df3[apply(df3,1,
+   #                                        function(x) all(!is.na(x))),]
+  #portfolio_observed <- df3[apply(df3,1,
+   #                                        function(x) all(!0)),]
 
  # portfolioPrices <- portfolioPrices[apply(portfolioPrices,1,
  #                                             function(x) all(!is.na(x))),]
 #  portfolioPrices<- portfolioPrices[apply(portfolioPrices,1,
   #                                           function(x) all(!0)),]
   # RM
+  if(RM=="^GSPC"){
   RM <- c("SP500")
+  if (length(Tickers)==1){
+      if(tickers==c("Current_SP500_Tickers")) {
+      df=t(portfolioPrices)
+      df2=df[apply(df,1,function(x) all(!is.na(x))),]
+      df3<-t(df2)
+
+
+      portfolio_observed <- df3[apply(df3,1,
+                                      function(x) all(!is.na(x))),]
+      portfolio_observed <- df3[apply(df3,1,
+                                      function(x) all(!0)),]
+      }} else{
+        portfolio_observed=as.matrix(portfolioPrices)
+      }
+  } else {
+    if(RM=='^BVSP'){
+  RM <- c("IBOV")
+  portfolio_observed=as.matrix(portfolioPrices)
+    }
+  }
   #Renames Columns
 
   tickers <- str_replace(tickers,".SA","")
   tickers <- str_replace(tickers,"-","")
   tickers <- str_replace(tickers,"=","")
   tickers <- str_replace(tickers,"^G","G")
+  tickers <- str_replace(tickers,"^B","B")
   colnames(portfolioPrices) <- tickers
+  colnames(portfolio_observed) <- tickers
   colnames(portfolioPrices)[1] <- RM
   colnames(portfolio_observed)[1] <- RM
 

@@ -8,11 +8,17 @@
 #' @param Final_Date_Training Series end Date
 #' @examples
 #' Initial_Date_Training <-c('2018-01-11')
-#' Final_Date_Training <- c('2022-12-30')
+#' Final_Date_Training <- c('2022-12-29')
 #' Final_Date_Testing <-c('2023-09-07')
-#' ANNt_order ('2018-01-11', '2022-12-30','2023-09-07')
+#' ANNt_order ('2018-01-11', '2022-12-29','2023-09-07')
 #' # Estimated processing time 30 minutes per asset
 #'
+#Portfolio optimization system using Artificial Neural Networks.
+#ANNt uses a Perceptron architecture, with a hidden layer of size equal to the
+#number of information in the input neurons.     Classifies the output neurons
+#of assets with leptokurtic distribution, which is more appropriate for financial
+#data.
+
 ANNt_order <- function(Initial_Date_Training, Final_Date_Training, Final_Date_Testing) {
   ## Convers?o das variaveis
   # Excesso do retorno em relacao ao RM
@@ -23,6 +29,17 @@ ANNt_order <- function(Initial_Date_Training, Final_Date_Training, Final_Date_Te
 
   tickers=colnames(scenario.set)
  dados<-scenario.set
+
+ # Duração do processamento 285.4/length(dados=0.2 horas)
+ Tempo=(285.4/length(dados))*(ncol((dados))-1)
+ dados2=data.frame(dados)
+ cat(paste("
+           Estimated total processing time: ", Tempo, " hour(s).
+___________________________________________________________________
+           Starting ANNt 1 of a total of ",ncol(dados)-1, " assets: ",colnames(dados2[2]), ".
+___________________________________________________________________
+", sep=""))
+
   ncoldados <- ncol(dados)
   nAtivos = ncol(dados)
   for (i in 2:ncoldados) {
@@ -102,8 +119,10 @@ ANNt_order <- function(Initial_Date_Training, Final_Date_Training, Final_Date_Te
     ativo = k+1
     #Envelope
 
+
     # Calculo das defasagens para cada ativo
-    dados2=data.frame(dados)
+
+
     dat_r <- data.frame(dados2[ativo], Lag(dados[,1],1))
     colnames(dat_r)[2]="RM"
 
@@ -113,9 +132,10 @@ ANNt_order <- function(Initial_Date_Training, Final_Date_Training, Final_Date_Te
     }
     ### removendo NAs
     #dat_r = na.fill(dat_r, "extend")
+    rownames(dat_r)=rownames(dados)
     dat_r = na.omit(dat_r)
     nlinhas = nrow(dat_r)
-    View(dat_r)
+    #View(dat_r)
 
     ####################### Amostra de Tratamento################################
     # Criando as vari?veis como vetor para treinamento - com datas espec?ficas
@@ -134,11 +154,36 @@ ANNt_order <- function(Initial_Date_Training, Final_Date_Training, Final_Date_Te
 
     #############################################################################
     ##Pacote neuralnet()
-
-    library(neuralnet)
-    library(zoo)
-    library(forecast)
-    library(timetk)
+    library("quantmod")
+    library("PerformanceAnalytics")
+    library("magrittr")
+    library("fBasics")
+    library("tidyverse")
+    library("stringr")
+    library("dplyr")
+    library("neuralnet")
+    library("zoo")
+    library("forecast")
+    library("timetk")
+    library("moments")
+    library("data.table")
+    library("ggplot2")
+    library("rvest")
+    library("caret")
+    library("readxl")
+    library("writexl")
+    library("portfolio.optimization")
+    library("PortfolioAnalytics")
+    library("ROI")
+    library("fPortfolio")
+    library("timeSeries")
+    library("gridExtra")
+    library("cowplot")
+    library("portfolioBacktest")
+    library("CVXR")
+    library("MFDFA")
+    library("DEoptim")
+    library("rvest")
 
     epocas = 25000
     # Fun??o Sigmoide
@@ -163,7 +208,6 @@ ANNt_order <- function(Initial_Date_Training, Final_Date_Training, Final_Date_Te
 
     colnames(entradas)[1]=colnames(dados2[ativo])
 
-    View(entradas)
 
     arquivo = colnames(entradas)[1]
     #arquivo = paste(arquivo,"_N.pdf", sep="")
@@ -185,6 +229,7 @@ ANNt_order <- function(Initial_Date_Training, Final_Date_Training, Final_Date_Te
 
     ## Previs?o
     prev = predict(nn, entradas)
+
     nome = colnames(entradas)[1]
     plot(as.vector(entradas[,1]), type="l", col= "red",
          main = paste("Retornos Amostra de Tratamento - Ativo", xnames = nome))
@@ -248,14 +293,24 @@ ANNt_order <- function(Initial_Date_Training, Final_Date_Training, Final_Date_Te
     if (mean(prev)>0) {
       ProbabilidadeTmedia =pt(0.0,
                               df=length(prev)-1,ncp = se, lower.tail=FALSE)
-      cat("Right asymmetric density (Negative)")
+      #print(paste("Right asymmetric density (Negative)"))
     } else {
       ProbabilidadeTmedia =pt(0.0,
                               df=length(prev)-1,ncp = -se, lower.tail=FALSE)
-      cat("Left asymmetric density (Positive)")
+      #print(paste("Left asymmetric density (Positive)"))
     }
     #ProbabilidadeTmedia =pt(mean(prev),
     #                    df=length(prev)-1,lower.tail=TRUE)
+
+    colnames(entradas)[1]=paste("(",ativo-1,") ",colnames(dados2[ativo]), sep="")
+    colnames(entradas)[2]=paste(colnames(dados2[1]),"-1",sep="")
+    colnames(entradas)[3]=paste(colnames(dados2[ativo]),"-1",sep="")
+    colnames(entradas)[4]=paste(colnames(dados2[ativo]),"-2",sep="")
+    colnames(entradas)[5]=paste(colnames(dados2[ativo]),"-3",sep="")
+    colnames(entradas)[6]=paste(colnames(dados2[ativo]),"-4",sep="")
+    colnames(entradas)[7]=paste(colnames(dados2[ativo]),"-5",sep="")
+
+    View(entradas)
 
     # Resultados das Probabilidades
 
@@ -344,7 +399,7 @@ ANNt_order <- function(Initial_Date_Training, Final_Date_Training, Final_Date_Te
       #erroCamadaSaida = 1 - saidas - camadaSaida # M?xima diferen?a
       erroCamadaSaida = saidas - camadaSaida # M?nima diferen?a
       mediaAbsoluta = mean(abs(erroCamadaSaida))
-      print(paste('Erro:', mediaAbsoluta))
+      print(paste('Error:', mediaAbsoluta))
 
       derivadaSaida = sigmoideDerivada(camadaSaida)
       deltaSaida = erroCamadaSaida * derivadaSaida
@@ -406,11 +461,11 @@ ANNt_order <- function(Initial_Date_Training, Final_Date_Training, Final_Date_Te
     if (mean(camadaSaida)>0) {
       ProbabilidadeTmedia =pt(0.0,
                               df=length(camadaSaida)-1,ncp = se, lower.tail=FALSE)
-      cat("Right asymmetric density (Negative)")
+     # cat("Right asymmetric density (Negative)")
     } else {
       ProbabilidadeTmedia =pt(0.0,
                               df=length(camadaSaida)-1,ncp = -se, lower.tail=FALSE)
-      cat("Left asymmetric density (Positive)")
+      #cat("Left asymmetric density (Positive)")
     }
     #ProbabilidadeTmedia =pt(mean(camadaSaida),
     #                 df=length(camadaSaida)-1, lower.tail = TRUE)
@@ -579,12 +634,12 @@ ANNt_order <- function(Initial_Date_Training, Final_Date_Training, Final_Date_Te
       ProbabilidadeTmedia =pt(0.0,
                               df=length(prevPredict)-1,ncp = se,
                               lower.tail=FALSE)
-      cat("Right asymmetric density (Negative)")
+      #cat("Right asymmetric density (Negative)")
     } else {
       ProbabilidadeTmedia =pt(0.0,
                               df=length(prevPredict)-1,ncp = -se,
                               lower.tail=FALSE)
-      cat("Left asymmetric density (Positive)")
+      #cat("Left asymmetric density (Positive)")
     }
     #ProbabilidadeTmedia =pt(mean(prev),
     #                    df=length(prev)-1,lower.tail=TRUE)
@@ -644,15 +699,31 @@ ANNt_order <- function(Initial_Date_Training, Final_Date_Training, Final_Date_Te
       ProbabilidadeTmedia =pt(0.0,
                               df=length(camadaSaidaPredict)-1,ncp = se,
                               lower.tail=FALSE)
-      cat("Right asymmetric density (Negative)")
+      print(paste("Right asymmetric density (Negative)"))
     } else {
       ProbabilidadeTmedia =pt(0.0,
                               df=length(camadaSaidaPredict)-1,ncp = -se,
                               lower.tail=FALSE)
-      cat("Left asymmetric density (Positive)")
+      print(paste("Left asymmetric density (Positive)"))
     }
     #ProbabilidadeTmedia =pt(mean(camadaSaida),
     #                 df=length(camadaSaida)-1, lower.tail = TRUE)
+
+    # Processing monitoring
+
+    if (ativo<(ncol(dados2))){
+    cat(paste("_______________________________________________________
+      Starting ANNt ",ativo," of a total of ",ncol(dados2)-1, " assets: ",colnames(dados2[ativo+1]),".
+      Estimated total processing time: ", Tempo-0.2*(ativo-1), " hour(s).
+_______________________________________________________
+", sep=""))
+    } else{
+    cat(paste("_______________________________________________________
+              ANNt for all assets concluded!
+_______________________________________________________
+"))
+    }
+
 
     Probabilidadest = NULL
     for (l in 1:nlinhasPredict){
@@ -879,9 +950,16 @@ ANNt_order <- function(Initial_Date_Training, Final_Date_Training, Final_Date_Te
   T7=data.frame(TesteTNNetPredict) #Resultado Prob. Dist t - NeuralNet Ordenada Test
   T8=data.frame(TesteTPosPredict) #Res Prob. Dist t - RNA Particular Ordenada Test
 
-  save(T8,file='~/Assets_ANNt_Order.rda')
+
 View(T8)
+
+Assets_ANNt_Order = T8
+rownames(Assets_ANNt_Order)='Probability'
+save(Assets_ANNt_Order,file='~/Assets_ANNt_Order.rda')
+nome_asset_order= str_replace(Final_Date_Testing,"-","_")
+nome_asset_order= str_replace(nome_asset_order,"-","_")
+nome_asset_order=paste("~/Assets_ANNt_Order_",nome_asset_order,".xlsx", sep="")
   save(T8,file='~/T9.rda')
-write_xlsx(T8, "~/Assets_ANNt_Order.xlsx")
+write_xlsx(Assets_ANNt_Order, nome_asset_order)
   ###############################
 }

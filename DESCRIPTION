@@ -1,11 +1,11 @@
 Package: ANNt
 Type: Package
 Title: Artificial Neural Network with 't' Distribution Portfolio
-Version: 0.1.0
+Version: 0.1.1
 Author: Alexandre Silva de Oliveira
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Maintainer: The package maintainer <aleoli05@gmail.com>
+Description: Portfolio optimization system using Artificial Neural Networks. 
+    ANNt uses a Perceptron architecture, with a hidden layer of size equal to the number of information in the input neurons. Classifies the output neurons of assets with leptokurtic distribution, which is more appropriate for financial data.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
