@@ -3,13 +3,15 @@
 #' @ param Tickers Name of the assets or "Current_SP500_Tickers" for all S&P 500 assets
 #' @examples
 #' # Specify the assets or "Current_SP500_Tickers" for all S&P 500 assets
-#' Tickers <-c('PETR4.SA','AAPL','Current_SP500_Tickers')
+#' # Apply the "load" command and use in "Asset_series" command
+#' Generate_Tickers <-c('PETR4.SA','AAPL','Current_SP500_Tickers')
 #'
 #' # Generates the Adjusted Daily Prices Series from Yahoo Finance
-#' Gen_tickers (Tickers=c('PETR4.SA','AAPL','Current_SP500_Tickers')
+#' Gen_tickers (Generate_Tickers=c('PETR4.SA','AAPL','Current_SP500_Tickers'))
+#' load('Generate_Tickers.rda')
 
 
-Gen_tickers=function(Tickers){
+Gen_tickers=function(Generate_Tickers){
 
 
   # library(webinar.cpom)
@@ -54,7 +56,15 @@ Gen_tickers=function(Tickers){
 
 
   library(rvest)
-    Test=Tickers
+  Tickers=Generate_Tickers
+  Tickers_1=Tickers
+  ################################################################################
+
+  ###############################
+  #install.packages("rvest")
+
+  library(rvest)
+
   # get the URL for the wikipedia page with all SP500 symbols
   url <- "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
   # use that URL to scrape the SP500 table using rvest
@@ -75,29 +85,29 @@ Gen_tickers=function(Tickers){
   Current_SP500<-sp500tickers$Symbol
   #######
 
-  x=as.numeric(any(c('Current_SP500_Tickers') %in% Test))
+  x=as.numeric(any(c('Current_SP500_Tickers') %in% Tickers_1))
   if (x==1) {
-    y=which(Test %in% c('Current_SP500_Tickers'))
-    Tickers2=Tickers[-y]
+    y=which(Tickers_1 %in% c('Current_SP500_Tickers'))
+    Tickers_2=Tickers[-y]
 
-    z=as.numeric(any(Tickers2 %in% Current_SP500))
+    z=as.numeric(any(Tickers_2 %in% Current_SP500))
     if (z==1) {
-      h=which(Tickers2 %in% Current_SP500)
-      Tickers3=Tickers2[-h]
-      Tick=c(Tickers3,Current_SP500)
+      h=which(Tickers_2 %in% Current_SP500)
+      Tickers_3=Tickers_2[-h]
+      Tick=c(Tickers_3,Current_SP500)
     }
 
-    Tick=c(Tickers2,Current_SP500)
+    Tick=c(Tickers_2,Current_SP500)
   } else {
-    #Tickers=Tickers
-    Tick=c('GGBR4.SA', Current_SP500)
+    Tick=Tickers_1
+
   }
+Generate_Tickers=Tick
+
+save(Generate_Tickers,file='~/Generate_Tickers.rda')
+save(Generate_Tickers,file='Generate_Tickers.rda')
+print(Generate_Tickers)
+load('~/Generate_Tickers.rda')
 }
-
-Tickers=Gen_tickers(Tick)
-
-save(Tickers,file='~/Tickers.rda')
-load(Tickers,file='~/Tickers.set.rda')
-
 
 ################################################################################

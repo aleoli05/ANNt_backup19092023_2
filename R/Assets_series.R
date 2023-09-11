@@ -53,17 +53,18 @@ Assets_series <- function(Tickers, RM, Initial_Date, Final_Date, Periodicity) {
   library(MFDFA)
   library(DEoptim)
 
-
   ################# Create Returns Times Series ###########################
   # RM
   RM <- RM
-  Current_SP500_Tickers<-NULL
-################################################################################
+  Tickers_1=Tickers
+  Condicao=Tickers
+  ################################################################################
 
   ###############################
   #install.packages("rvest")
 
   library(rvest)
+
   # get the URL for the wikipedia page with all SP500 symbols
   url <- "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
   # use that URL to scrape the SP500 table using rvest
@@ -81,13 +82,30 @@ Assets_series <- function(Tickers, RM, Initial_Date, Final_Date, Periodicity) {
                                            case_when(Symbol == "BRK.B" ~ "BRK-B",
                                                      Symbol == "BF.B" ~ "BF-B",
                                                      TRUE ~ as.character(Symbol)))
-  Current_SP500_Tickers<-sp500tickers$Symbol
+  Current_SP500<-sp500tickers$Symbol
   #######
-  if (length(Tickers)==1){
-  if (Tickers == c('Current_SP500_Tickers')) {
-    Tickers = Current_SP500_Tickers
-  }}
-  ################################################################################
+
+    x=as.numeric(any(c('Current_SP500_Tickers') %in% Tickers_1))
+    if (x==1) {
+      y=which(Tickers_1 %in% c('Current_SP500_Tickers'))
+      Tickers_2=Tickers[-y]
+
+      z=as.numeric(any(Tickers_2 %in% Current_SP500))
+      if (z==1) {
+        h=which(Tickers_2 %in% Current_SP500)
+        Tickers_3=Tickers_2[-h]
+        Tick=c(Tickers_3,Current_SP500)
+      }
+
+      Tick=c(Tickers_2,Current_SP500)
+    } else {
+      Tick=Tickers_1
+
+    }
+
+
+Tickers=Tick
+#########################################################################################
 
   #Calculate Returns: Daily
   tickers <- c(RM,Tickers)
@@ -101,8 +119,22 @@ Assets_series <- function(Tickers, RM, Initial_Date, Final_Date, Periodicity) {
                                               auto.assign=FALSE)[,6])
 
   # Salve SP500 in excel
+
+
   colnames(portfolioPrices) <- str_replace(tickers,".Close","")
   colnames(portfolioPrices) <- str_replace(tickers,".Adjusted","")
+  tickers <- str_replace(tickers,".SA","")
+  tickers <- str_replace_all(tickers,"^","")
+  tickers= as.data.frame(tickers)
+  tickers= tickers %>% mutate(tickers =
+                                              case_when(tickers == "^BVSP" ~ "IBOV",
+                                                       tickers == "^GSPC" ~ "SP500",
+                                                      TRUE ~ as.character(tickers)))
+  tickers = as.character(tickers[,1])
+  tickers <- str_replace(tickers,"-","")
+  tickers <- str_replace(tickers,"=","")
+  colnames(portfolioPrices) <- tickers
+
   portfolioPrices_Teste = portfolioPrices
 
 
@@ -110,57 +142,41 @@ Assets_series <- function(Tickers, RM, Initial_Date, Final_Date, Periodicity) {
   portfolioPrices_Df = mutate(as.data.frame(Datas_portfolio),
                               as.data.frame(portfolioPrices))
 
+  #Renames Columns
+  tickers <- colnames(portfolioPrices)
 
- # df=t(portfolioPrices)
-#  df2=df[apply(df,1,function(x) all(!is.na(x))),]
- # df3<-t(df2)
+  if (length(Condicao)==1){
+  df=t(portfolioPrices)
+  df2=df[apply(df,1,function(x) all(!is.na(x))),]
+  df3<-t(df2)
 
 
-  #portfolio_observed <- df3[apply(df3,1,
-   #                                        function(x) all(!is.na(x))),]
-  #portfolio_observed <- df3[apply(df3,1,
-   #                                        function(x) all(!0)),]
+  portfolio_observed <- df3[apply(df3,1,
+                                 function(x) all(!is.na(x))),]
+  portfolio_observed <- df3[apply(df3,1,
+                                 function(x) all(!0)),]
 
- # portfolioPrices <- portfolioPrices[apply(portfolioPrices,1,
- #                                             function(x) all(!is.na(x))),]
-#  portfolioPrices<- portfolioPrices[apply(portfolioPrices,1,
-  #                                           function(x) all(!0)),]
-  # RM
+  }else{
+
+   portfolioPrices <- portfolioPrices[apply(portfolioPrices,1,
+                                function(x) all(!is.na(x))),]
+   portfolioPrices<- portfolioPrices[apply(portfolioPrices,1,
+                                 function(x) all(!0)),]
+   portfolio_observed=portfolioPrices
+  }
+
   if(RM=="^GSPC"){
-  RM <- c("SP500")
-  if (length(Tickers)==1){
-      if(tickers==c("Current_SP500_Tickers")) {
-      df=t(portfolioPrices)
-      df2=df[apply(df,1,function(x) all(!is.na(x))),]
-      df3<-t(df2)
+    RM <- c("SP500")
 
-
-      portfolio_observed <- df3[apply(df3,1,
-                                      function(x) all(!is.na(x))),]
-      portfolio_observed <- df3[apply(df3,1,
-                                      function(x) all(!0)),]
-      }} else{
-        portfolio_observed=as.matrix(portfolioPrices)
-      }
   } else {
     if(RM=='^BVSP'){
-  RM <- c("IBOV")
-  portfolio_observed=as.matrix(portfolioPrices)
+      RM <- c("IBOV")
     }
   }
-  #Renames Columns
 
-  tickers <- str_replace(tickers,".SA","")
-  tickers <- str_replace(tickers,"-","")
-  tickers <- str_replace(tickers,"=","")
-  tickers <- str_replace(tickers,"^G","G")
-  tickers <- str_replace(tickers,"^B","B")
-  colnames(portfolioPrices) <- tickers
-  colnames(portfolio_observed) <- tickers
   colnames(portfolioPrices)[1] <- RM
   colnames(portfolio_observed)[1] <- RM
 
-  #View(portfolioPrices)
 
   # Calculate Returns: Daily RoC
 
@@ -176,9 +192,8 @@ Assets_series <- function(Tickers, RM, Initial_Date, Final_Date, Periodicity) {
   assets <- ncol(scenario.set)
   scenarios <- nrow(scenario.set)
   saveRDS(scenario.set,file='scenario.set')
-  save(scenario.set,file='senario.set.rda')
   save(tickers,file='~/tickers.rda')
-  save(scenario.set,file='~/senario.set.rda')
+  save(scenario.set,file='~/scenario.set.rda')
   save(scenario.set,file='~/Assets_Returns.rda')
   save(portfolioPrices,file='~/Assets_Prices.rda')
   Assets_Prices=portfolioPrices

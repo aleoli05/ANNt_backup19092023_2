@@ -24,14 +24,15 @@ ANNt_order <- function(Initial_Date_Training, Final_Date_Training, Final_Date_Te
   # Excesso do retorno em relacao ao RM
 
 
-  load("~/senario.set.rda") # Carrega objeto scenario.set
+  load("~/scenario.set.rda") # Carrega objeto scenario.set
   #load("~/tickers.rda") # Carrega objeto scenario.set
 
   tickers=colnames(scenario.set)
  dados<-scenario.set
 
  # Duração do processamento 285.4/length(dados=0.2 horas)
- Tempo=(285.4/length(dados))*(ncol((dados))-1)
+ Fator_Tempo = 285.4/length(dados)
+ Tempo= Fator_Tempo*(ncol((dados))-1)
  dados2=data.frame(dados)
  cat(paste("
            Estimated total processing time: ", Tempo, " hour(s).
@@ -132,11 +133,12 @@ ___________________________________________________________________
     }
     ### removendo NAs
     #dat_r = na.fill(dat_r, "extend")
-    rownames(dat_r)=rownames(dados)
+
     dat_r = na.omit(dat_r)
     nlinhas = nrow(dat_r)
+    dat_r <- as.matrix(dat_r)
+    rownames(dat_r)=rownames(dados2[(defasagem+1):nrow(dados2),])
     #View(dat_r)
-
     ####################### Amostra de Tratamento################################
     # Criando as vari?veis como vetor para treinamento - com datas espec?ficas
     Inicio_data = as.Date(Initial_Date_Training)
@@ -714,7 +716,7 @@ ___________________________________________________________________
     if (ativo<(ncol(dados2))){
     cat(paste("_______________________________________________________
       Starting ANNt ",ativo," of a total of ",ncol(dados2)-1, " assets: ",colnames(dados2[ativo+1]),".
-      Estimated total processing time: ", Tempo-0.2*(ativo-1), " hour(s).
+      Estimated total processing time: ", Tempo-Fator_Tempo*(ativo-1), " hour(s).
 _______________________________________________________
 ", sep=""))
     } else{

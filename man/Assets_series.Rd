@@ -4,17 +4,20 @@
 \alias{Assets_series}
 \title{Import the series}
 \usage{
-Assets_series(Tickers, RM, Initial_Date, Final_Date)
+Assets_series(Tickers, RM, Initial_Date, Final_Date, Periodicity)
 }
 \arguments{
 \item{Tickers}{Name of the assets or "Current_SP500_Tickers" for all S&P 500 assets}
 
 \item{RM}{Proxy of the market}
 
-\item{Final_Date}{Series end Date ('Year-Month-Day')
+\item{Initial_Date}{Series start Date, format ('Year-Month-Day')
+
 Assets with values not observed in the series are excluded}
 
-\item{Inicial_Date}{Series start Date, format ('Year-Month-Day')}
+\item{Final_Date}{Series end Date ('Year-Month-Day')}
+
+\item{Periodicity}{should be one of “daily”, “weekly”, “monthly”, “hourly”, “1minutes”, “2minutes”, “5minutes”, “15minutes”, “30minutes”, “60minutes”, “90minutes”}
 }
 \description{
 Import the series
@@ -25,8 +28,9 @@ Tickers <-c('AAPL','GOOG','CCBG', 'XOM', 'TSLA')
 RM <-c('^GSPC') #RM the S&P500
 Initial_Date <-c('2018-01-03')
 Final_Date <-c('2023-09-07')
+Periodicity <- c('daily')
 
 # Generates the Adjusted Daily Prices Series from Yahoo Finance
-Assets_series (Tickers=c('AAPL','GOOG','CCBG','XOM','TSLA'),'^GSPC', '2018-01-03', '2023-09-07')
+Assets_series (Tickers=c('AAPL','GOOG','CCBG','XOM','TSLA'),'^GSPC', '2018-01-03', '2023-09-07','daily')
 
 }
