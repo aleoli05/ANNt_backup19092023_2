@@ -34,7 +34,7 @@ ANNt_order <- function(Initial_Date_Training, Final_Date_Training, Final_Date_Te
 
  # Duração do processamento 285.4/length(dados=0.2 horas)
  Fator_Tempo = 280/length(dados)*Stepmax/2500
- Tempo= Fator_Tempo*(ncol((dados))-1)
+ Tempo= round(Fator_Tempo*(ncol((dados))-1),1)
  dados2=data.frame(dados)
  cat(paste("
            Estimated total processing time: ", Tempo, " hour(s).
@@ -718,7 +718,7 @@ ___________________________________________________________________
     if (ativo<(ncol(dados2))){
     cat(paste("_______________________________________________________
       Starting ANNt ",ativo," of a total of ",ncol(dados2)-1, " assets: ",colnames(dados2[ativo+1]),".
-      Estimated total processing time: ", Tempo-Fator_Tempo*(ativo-1), " hour(s).
+      Estimated total processing time: ", round(Tempo-Fator_Tempo*(ativo-1),1), " hour(s).
 _______________________________________________________
 ", sep=""))
     } else{
