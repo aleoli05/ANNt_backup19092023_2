@@ -2,3 +2,5 @@
 
 export(ANNt_order)
 export(Assets_series)
+export(Gen_tickers)
+export(Install_required_packages)
