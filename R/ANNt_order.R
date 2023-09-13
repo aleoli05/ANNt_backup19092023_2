@@ -6,11 +6,13 @@
 #' @param Inicial_Date Series start Date (Must be 7 perios greater than the analyzed seriess)
 # @param Date_Training Series finish training date
 #' @param Final_Date_Training Series end Date
+#' @param Stepmax Number of replications per asset to train the ANN
 #' @examples
 #' Initial_Date_Training <-c('2018-01-11')
 #' Final_Date_Training <- c('2022-12-29')
 #' Final_Date_Testing <-c('2023-09-07')
-#' ANNt_order ('2018-01-11', '2022-12-29','2023-09-07')
+#' Stepmax <- 2500
+#' ANNt_order ('2018-01-11','2022-12-29','2023-09-07',2500)
 #' # Estimated processing time 30 minutes per asset
 #'
 #Portfolio optimization system using Artificial Neural Networks.
@@ -19,7 +21,7 @@
 #of assets with leptokurtic distribution, which is more appropriate for financial
 #data.
 
-ANNt_order <- function(Initial_Date_Training, Final_Date_Training, Final_Date_Testing) {
+ANNt_order <- function(Initial_Date_Training, Final_Date_Training, Final_Date_Testing, Stepmax) {
   ## Convers?o das variaveis
   # Excesso do retorno em relacao ao RM
 
@@ -31,7 +33,7 @@ ANNt_order <- function(Initial_Date_Training, Final_Date_Training, Final_Date_Te
  dados<-scenario.set
 
  # Duração do processamento 285.4/length(dados=0.2 horas)
- Fator_Tempo = 285.4/length(dados)
+ Fator_Tempo = 280/length(dados)*Stepmax/2500
  Tempo= Fator_Tempo*(ncol((dados))-1)
  dados2=data.frame(dados)
  cat(paste("
@@ -187,7 +189,7 @@ ___________________________________________________________________
     library("DEoptim")
     library("rvest")
 
-    epocas = 25000
+    epocas = 10*Stepmax
     # Fun??o Sigmoide
     sigmoide = function(soma) {
       #return (1/ (1+exp(-soma)))
@@ -374,7 +376,7 @@ ___________________________________________________________________
     }
 
     # Estimando o n?mero de ?pocas e a taxa de aprendizagem
-    epocas = 2500
+    epocas = Stepmax
     momento = 1
     taxaAprendizagem = 0.3
     #########################################
@@ -961,7 +963,14 @@ save(Assets_ANNt_Order,file='~/Assets_ANNt_Order.rda')
 nome_asset_order= str_replace(Final_Date_Testing,"-","_")
 nome_asset_order= str_replace(nome_asset_order,"-","_")
 nome_asset_order=paste("~/Assets_ANNt_Order_",nome_asset_order,".xlsx", sep="")
-  save(T8,file='~/T9.rda')
+  save(T1,file='~/T1.rda')
+  save(T2,file='~/T2.rda')
+  save(T3,file='~/T3.rda')
+  save(T4,file='~/T4.rda')
+  save(T5,file='~/T5.rda')
+  save(T6,file='~/T6.rda')
+  save(T7,file='~/T7.rda')
+  save(T8,file='~/T8.rda')
 write_xlsx(Assets_ANNt_Order, nome_asset_order)
   ###############################
 }

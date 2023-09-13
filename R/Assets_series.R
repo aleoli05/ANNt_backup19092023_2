@@ -6,7 +6,7 @@
 #'
 #' Assets with values not observed in the series are excluded
 #' @param Final_Date Series end Date ('Year-Month-Day')
-#' @param Periodicity should be one of “daily”, “weekly”, “monthly”, “hourly”, “1minutes”, “2minutes”, “5minutes”, “15minutes”, “30minutes”, “60minutes”, “90minutes”
+#' @param Periodicity should be one of “daily”, “weekly”, “monthly”, “hourly”, “1minutes”, “2minutes”, “5minutes”, “15minutes”, “30minutes”, “60minutes”, “90minutes”. (Intraday maximum 7 days)
 
 
 #' @examples
@@ -106,7 +106,9 @@ Assets_series <- function(Tickers, RM, Initial_Date, Final_Date, Periodicity) {
 
 Tickers=Tick
 #########################################################################################
+if (x==1) {
 
+  Tickers = Current_SP500
   #Calculate Returns: Daily
   tickers <- c(RM,Tickers)
   portfolioPrices <- NULL
@@ -145,7 +147,7 @@ Tickers=Tick
   #Renames Columns
   tickers <- colnames(portfolioPrices)
 
-  if (length(Condicao)==1){
+  #if (length(Condicao)==1){
   df=t(portfolioPrices)
   df2=df[apply(df,1,function(x) all(!is.na(x))),]
   df3<-t(df2)
@@ -155,9 +157,118 @@ Tickers=Tick
                                  function(x) all(!is.na(x))),]
   portfolio_observed <- df3[apply(df3,1,
                                  function(x) all(!0)),]
+  portfolio_observed1 = portfolio_observed
 
-  }else{
+  if(length(Tick)>length(Current_SP500)){
+    g=which(Tick %in% Current_SP500)
+    tickers= Tick[-g]
 
+    #Calculate Returns: Daily
+    tickers2 <- tickers
+    portfolioPrices <- NULL
+
+    for (Ticker in tickers2)
+      portfolioPrices <- cbind(portfolioPrices,
+                               getSymbols.yahoo(Ticker, from= Initial_Date,
+                                                to= Final_Date,
+                                                periodicity= Periodicity,
+                                                auto.assign=FALSE)[,6])
+
+    # Salve SP500 in excel
+
+
+    colnames(portfolioPrices) <- str_replace(tickers,".Close","")
+    colnames(portfolioPrices) <- str_replace(tickers,".Adjusted","")
+    tickers <- str_replace(tickers,".SA","")
+    tickers <- str_replace_all(tickers,"^","")
+    tickers= as.data.frame(tickers)
+    tickers= tickers %>% mutate(tickers =
+                                  case_when(tickers == "^BVSP" ~ "IBOV",
+                                            tickers == "^GSPC" ~ "SP500",
+                                            TRUE ~ as.character(tickers)))
+    tickers = as.character(tickers[,1])
+    tickers <- str_replace(tickers,"-","")
+    tickers <- str_replace(tickers,"=","")
+    colnames(portfolioPrices) <- tickers
+
+    portfolioPrices_Teste = portfolioPrices
+
+    #portfolioPrices=cbind(portfolioPrices,portfolio_observed1)
+
+    Datas_portfolio = rownames(as.data.frame(portfolioPrices))
+    portfolioPrices_Df = mutate(as.data.frame(Datas_portfolio),
+                                as.data.frame(portfolioPrices))
+
+    #Renames Columns
+    tickers <- colnames(portfolioPrices)
+    portfolioPrices_Teste = portfolioPrices
+
+
+    Datas_portfolio = rownames(as.data.frame(portfolioPrices))
+    portfolioPrices_Df = mutate(as.data.frame(Datas_portfolio),
+                                as.data.frame(portfolioPrices))
+    portfolioPrices <- portfolioPrices[apply(portfolioPrices,1,
+                                             function(x) all(!is.na(x))),]
+    portfolioPrices<- portfolioPrices[apply(portfolioPrices,1,
+                                            function(x) all(!0)),]
+    portfolio_observed2=portfolioPrices
+    d1=as.data.frame(cbind("id"=rownames(portfolio_observed1),portfolio_observed1))
+    d2=as.data.frame(cbind("id"=rownames(as.data.frame(portfolio_observed2)),as.data.frame(portfolio_observed2)))
+    # d1= data.frame(portfolio_observed1)
+    # d2= data.frame(portfolio_observed2)
+    portfolio_observed=full_join(d1,d2, by=c("id"))
+    #portfolio_observed=full_join(d2,d1, by=colnames(d2[1]))
+    rownames(portfolio_observed)=portfolio_observed[,1]
+    portfolio_observed=as.matrix(portfolio_observed[,-1])
+
+    port= matrix(ncol=ncol(portfolio_observed), nrow=nrow(portfolio_observed))
+    for (i in 1:ncol(portfolio_observed)) {
+      for (k in 1:nrow(portfolio_observed)) {
+      port[k,i]=matrix(as.numeric(portfolio_observed[k,i]))
+      }
+    }
+    colnames(port)=colnames(portfolio_observed)
+    rownames(port)=rownames(portfolio_observed)
+    portfolio_observed=port
+    #portfolio_observed=merge(as.data.frame(d1),as.data.frame(d2), all=T)
+  }}
+   if (x==0) {
+
+     Tickers_n = Tickers_1
+     #Calculate Returns: Daily
+     tickers <- c(RM,Tickers_n)
+     portfolioPrices <- NULL
+
+     for (Ticker in tickers)
+       portfolioPrices <- cbind(portfolioPrices,
+                                getSymbols.yahoo(Ticker, from= Initial_Date,
+                                                 to= Final_Date,
+                                                 periodicity= Periodicity,
+                                                 auto.assign=FALSE)[,6])
+
+     # Salve SP500 in excel
+
+
+     colnames(portfolioPrices) <- str_replace(tickers,".Close","")
+     colnames(portfolioPrices) <- str_replace(tickers,".Adjusted","")
+     tickers <- str_replace(tickers,".SA","")
+     tickers <- str_replace_all(tickers,"^","")
+     tickers= as.data.frame(tickers)
+     tickers= tickers %>% mutate(tickers =
+                                   case_when(tickers == "^BVSP" ~ "IBOV",
+                                             tickers == "^GSPC" ~ "SP500",
+                                             TRUE ~ as.character(tickers)))
+     tickers = as.character(tickers[,1])
+     tickers <- str_replace(tickers,"-","")
+     tickers <- str_replace(tickers,"=","")
+     colnames(portfolioPrices) <- tickers
+
+     portfolioPrices_Teste = portfolioPrices
+
+
+     Datas_portfolio = rownames(as.data.frame(portfolioPrices))
+     portfolioPrices_Df = mutate(as.data.frame(Datas_portfolio),
+                                 as.data.frame(portfolioPrices))
    portfolioPrices <- portfolioPrices[apply(portfolioPrices,1,
                                 function(x) all(!is.na(x))),]
    portfolioPrices<- portfolioPrices[apply(portfolioPrices,1,
@@ -171,8 +282,8 @@ Tickers=Tick
   } else {
     if(RM=='^BVSP'){
       RM <- c("IBOV")
-    }
-  }
+
+  }}
 
   colnames(portfolioPrices)[1] <- RM
   colnames(portfolio_observed)[1] <- RM
@@ -181,7 +292,8 @@ Tickers=Tick
   # Calculate Returns: Daily RoC
 
     #portfolioReturns <- na.omit(ROC(portfolioPrices, type="discrete"))
-  portfolioReturns <- na.omit(ROC(portfolio_observed, type="discrete"))
+  portfolioReturns <- as.matrix(na.omit(ROC(portfolio_observed), type="discrete"))
+  #portfolioReturns <- as.matrix(na.omit(portfolio_observed, type="discrete"))
 
   scenario.set <- portfolioReturns
 

@@ -17,7 +17,7 @@ Assets with values not observed in the series are excluded}
 
 \item{Final_Date}{Series end Date ('Year-Month-Day')}
 
-\item{Periodicity}{should be one of “daily”, “weekly”, “monthly”, “hourly”, “1minutes”, “2minutes”, “5minutes”, “15minutes”, “30minutes”, “60minutes”, “90minutes”}
+\item{Periodicity}{should be one of “daily”, “weekly”, “monthly”, “hourly”, “1minutes”, “2minutes”, “5minutes”, “15minutes”, “30minutes”, “60minutes”, “90minutes”. (Intraday maximum 7 days)}
 }
 \description{
 Import the series

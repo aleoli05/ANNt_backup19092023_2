@@ -7,10 +7,17 @@
 classify assets by the probability of return exceeding a RM,
 using artificial neural networks and t-distribution}
 \usage{
-ANNt_order(Initial_Date_Training, Final_Date_Training, Final_Date_Testing)
+ANNt_order(
+  Initial_Date_Training,
+  Final_Date_Training,
+  Final_Date_Testing,
+  Stepmax
+)
 }
 \arguments{
 \item{Final_Date_Training}{Series end Date}
+
+\item{Stepmax}{Number of replications per asset to train the ANN}
 
 \item{Inicial_Date}{Series start Date (Must be 7 perios greater than the analyzed seriess)}
 }
@@ -24,7 +31,8 @@ using artificial neural networks and t-distribution
 Initial_Date_Training <-c('2018-01-11')
 Final_Date_Training <- c('2022-12-29')
 Final_Date_Testing <-c('2023-09-07')
-ANNt_order ('2018-01-11', '2022-12-29','2023-09-07')
+Stepmax <- 2500
+ANNt_order ('2018-01-11','2022-12-29','2023-09-07',2500)
 # Estimated processing time 30 minutes per asset
 
 }
