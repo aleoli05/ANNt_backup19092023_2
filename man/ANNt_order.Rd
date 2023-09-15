@@ -5,17 +5,21 @@
 \title{ANNt_order
 , after import the assets, with the command Asset_series,
 classify assets by the probability of return exceeding a RM,
-using artificial neural networks and t-distribution}
+using artificial neural networks and t-distribution.
+The number of input neurons is the number of assets generate in "Asset_series" command.}
 \usage{
 ANNt_order(
   Initial_Date_Training,
   Final_Date_Training,
   Final_Date_Testing,
+  Hidden,
   Stepmax
 )
 }
 \arguments{
-\item{Final_Date_Training}{Series end Date}
+\item{Final_Date_Training}{Series end Date (If '' is the System Date)}
+
+\item{Hidden}{Number of hidden neurons (If '' is the length series)}
 
 \item{Stepmax}{Number of replications per asset to train the ANN}
 
@@ -25,14 +29,16 @@ ANNt_order(
 ANNt_order
 , after import the assets, with the command Asset_series,
 classify assets by the probability of return exceeding a RM,
-using artificial neural networks and t-distribution
+using artificial neural networks and t-distribution.
+The number of input neurons is the number of assets generate in "Asset_series" command.
 }
 \examples{
 Initial_Date_Training <-c('2018-01-11')
 Final_Date_Training <- c('2022-12-29')
 Final_Date_Testing <-c('2023-09-07')
+Hidden <- 5
 Stepmax <- 2500
-ANNt_order ('2018-01-11','2022-12-29','2023-09-07',2500)
+ANNt_order ('2018-01-11','2022-12-29','2023-09-07', 5, 2500)
 # Estimated processing time 30 minutes per asset
 
 }

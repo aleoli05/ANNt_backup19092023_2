@@ -1,18 +1,21 @@
 #' ANNt_order
 #' , after import the assets, with the command Asset_series,
 #' classify assets by the probability of return exceeding a RM,
-#' using artificial neural networks and t-distribution
+#' using artificial neural networks and t-distribution.
+#' The number of input neurons is the number of assets generate in "Asset_series" command.
 #' @export
 #' @param Inicial_Date Series start Date (Must be 7 perios greater than the analyzed seriess)
 # @param Date_Training Series finish training date
-#' @param Final_Date_Training Series end Date
+#' @param Final_Date_Training Series end Date (If '' is the System Date)
+#' @param Hidden Number of hidden neurons (If '' is the length series)
 #' @param Stepmax Number of replications per asset to train the ANN
 #' @examples
 #' Initial_Date_Training <-c('2018-01-11')
 #' Final_Date_Training <- c('2022-12-29')
 #' Final_Date_Testing <-c('2023-09-07')
+#' Hidden <- 5
 #' Stepmax <- 2500
-#' ANNt_order ('2018-01-11','2022-12-29','2023-09-07',2500)
+#' ANNt_order ('2018-01-11','2022-12-29','2023-09-07', 5, 2500)
 #' # Estimated processing time 30 minutes per asset
 #'
 #Portfolio optimization system using Artificial Neural Networks.
@@ -21,7 +24,7 @@
 #of assets with leptokurtic distribution, which is more appropriate for financial
 #data.
 
-ANNt_order <- function(Initial_Date_Training, Final_Date_Training, Final_Date_Testing, Stepmax) {
+ANNt_order <- function(Initial_Date_Training, Final_Date_Training, Final_Date_Testing, Hidden, Stepmax) {
   ## Convers?o das variaveis
   # Excesso do retorno em relacao ao RM
 
@@ -32,15 +35,30 @@ ANNt_order <- function(Initial_Date_Training, Final_Date_Training, Final_Date_Te
   tickers=colnames(scenario.set)
  dados<-scenario.set
 
+
+ if(Final_Date_Testing==('')){
+   Final_Date_Testing=Sys.Date()
+ }
+
+ if (Hidden==''){
+   Cont1=nrow(dados)-5
+ } else{
+   Cont1=Hidden
+ }
  # Duração do processamento 285.4/length(dados=0.2 horas)
- Fator_Tempo = 200/nrow(dados)*Stepmax/2500
+
+ Fator_Tempo = 1200/nrow(dados)*Cont1/(nrow(dados)-5)*Stepmax/2500
+ Unidade=' minute(s)'
  Tempo= round(Fator_Tempo*(ncol((dados))-1),2)
+ if (Tempo>120){
+   Unidade=' hour(s)'
+   Tempo=Tempo/60
+ }
  dados2=data.frame(dados)
  cat(paste("
-           Estimated total processing time: ", Tempo, " hour(s).
+           Estimated total processing time: ", Tempo, Unidade,"
 ___________________________________________________________________
            Starting ANNt 1 of a total of ",ncol(dados)-1, " assets: ",colnames(dados2[2]), ".
-___________________________________________________________________
 ", sep=""))
 
   ncoldados <- ncol(dados)
@@ -108,9 +126,11 @@ ___________________________________________________________________
   ########################
   #### Cria??o da vari?vel de armazenamento dos resultados de assimetria e curtose
   #### Particular por Probabilidade t de Student
-  Resultados_Assim_Curtose = matrix(ncol=nAtivos-1,nrow=4)
+  Resultados_Assim_Curtose = matrix(ncol=nAtivos-1,nrow=8)
   Resultados_Assim_Curtose = data.frame(Resultados_Assim_Curtose)
   colnames(Resultados_Assim_Curtose)=tickers[-1]
+  rownames(Resultados_Assim_Curtose) = c('Probability','Mean','Median','Stand. Dev.',
+                                         'Kurtosis','Skewness','Minimum','Maximum')
   Resultados_Assim_Curtose
 
 
@@ -189,6 +209,10 @@ ___________________________________________________________________
     library("DEoptim")
     library("rvest")
 
+    if (Hidden==''){
+      Hidden=nlinhas
+    }
+
     epocas = 10*Stepmax
     # Fun??o Sigmoide
     sigmoide = function(soma) {
@@ -199,12 +223,13 @@ ___________________________________________________________________
     }
     colnames(entradas)[1]= "ATIVO"
     nn= neuralnet( ATIVO ~ RM + V3 + V4 + V5 + V6 + V7, data=entradas,
-                   hidden = nlinhas, act.fct = "tanh", threshold = 0.1,
+                   hidden = Hidden, act.fct = "tanh", threshold = 0.1,
                    stepmax=epocas)
     # Plotagem da RNA
-    if(nlinhas %% 2 == 0) {
-      escondida = nlinhas
-    } else {escondida =nlinhas+1}
+
+    if(Hidden %% 2 == 0) {
+      escondida = Hidden
+      } else {escondida =Hidden+1}
     nnplot= neuralnet( ATIVO ~ RM + V3 + V4 + V5 + V6 + V7, data=entradas,
                        hidden = escondida, act.fct = "tanh", threshold = 0.1,
                        stepmax=epocas)
@@ -219,7 +244,9 @@ ___________________________________________________________________
     #ggsave(arquivo,p1)
     #pdf(file=arquivo, height = 8, width = 9)
     #pdf(file=arquivo)
-    # plot(nnplot)
+    if (ativo==ncol(dados)){
+     plot(nnplot)
+    }
     #dev.off()
     #p1 <- plot(nnplot)
     #p1
@@ -337,11 +364,12 @@ ___________________________________________________________________
     ncolunas <- ncol(entradas)
 
     # Gerando pesos iniciais aleat?rios
+    options(warn=-1)
     pesos0 = matrix(runif(ncolunas*nlinhas, min = 0, max = 1), nrow = ncolunas,
-                    ncol = nlinhas, byrow = T)
-    pesos1 = matrix(runif(ncolunas*(nlinhas), min = 0, max = 1), nrow = nlinhas,
+                    ncol = Hidden, byrow = T)
+    pesos1 = matrix(runif(ncolunas*(nlinhas), min = 0, max = 1), nrow = Hidden,
                     ncol = 1, byrow = T)
-
+    options(warn=-1)
     ### pesos1 com Bias na camada oculta
     #pesos1 = matrix(runif(ncolunas*(nlinhas+1), min = 0, max = 1),
     #nrow = nlinhas+1, ncol = 1, byrow = T)
@@ -403,7 +431,10 @@ ___________________________________________________________________
       #erroCamadaSaida = 1 - saidas - camadaSaida # M?xima diferen?a
       erroCamadaSaida = saidas - camadaSaida # M?nima diferen?a
       mediaAbsoluta = mean(abs(erroCamadaSaida))
-      print(paste('Error:', mediaAbsoluta))
+
+      if (ativo==ncol(dados)){
+      #print(paste('Error:', mediaAbsoluta))
+      }
 
       derivadaSaida = sigmoideDerivada(camadaSaida)
       deltaSaida = erroCamadaSaida * derivadaSaida
@@ -447,10 +478,10 @@ ___________________________________________________________________
     library(moments)
     #png(file = "leptokurtic.png")
 
-    if (kurtosis(camadaSaida)>3) {
-      print("Leptokutic curve kurtosis:")
-      print(kurtosis(camadaSaida))
-    }
+    #if (kurtosis(camadaSaida)>3) {
+     # print("Leptokutic curve kurtosis:")
+      #print(kurtosis(camadaSaida))
+    #}
     t = 3.373 # p =0.1
     q = -0.4
     ProbtStudent = (q-mean(camadaSaida))/(std.error(camadaSaida))
@@ -685,8 +716,9 @@ ___________________________________________________________________
     #png(file = "leptokurtic.png")
 
     if (kurtosis(camadaSaidaPredict)>3) {
-      print("Leptokurtic curve kurtosis:")
-      print(kurtosis(camadaSaidaPredict))
+      ku=kurtosis(camadaSaidaPredict)
+      print(paste("Leptokurtic curve kurtosis:", ku))
+      #print(ku)
     }
     t = 3.373 # p =0.1
     q = -0.4
@@ -716,15 +748,14 @@ ___________________________________________________________________
     # Processing monitoring
 
     if (ativo<(ncol(dados2))){
-    cat(paste("_______________________________________________________
-      Starting ANNt ",ativo," of a total of ",ncol(dados2)-1, " assets: ",colnames(dados2[ativo+1]),".
-      Estimated total processing time: ", round(Tempo-Fator_Tempo*(ativo-1),2), " hour(s).
-_______________________________________________________
+    cat(paste("___________________________________________________________________
+           Starting ANNt ",ativo," of a total of ",ncol(dados2)-1, " assets: ",colnames(dados2[ativo+1]),".
+           Estimated total processing time: ", round(Tempo-Fator_Tempo*(ativo-1),2), Unidade,"
 ", sep=""))
     } else{
-    cat(paste("_______________________________________________________
-              ANNt for all assets concluded!
-_______________________________________________________
+    cat(paste("___________________________________________________________________
+                   ANNt for all assets concluded
+___________________________________________________________________
 "))
     }
 
@@ -782,7 +813,14 @@ _______________________________________________________
 
     ResProbPosPredict[1,k]= ProbPos
     ResProbTPosPredict[1,k]= ProbabilidadeTmedia
-
+    Resultados_Assim_Curtose[1,k]=ProbabilidadeTmedia
+    Resultados_Assim_Curtose[2,k]=mean(camadaSaidaPredict)
+    Resultados_Assim_Curtose[3,k]=median(camadaSaidaPredict)
+    Resultados_Assim_Curtose[4,k]=sd(camadaSaidaPredict)
+    Resultados_Assim_Curtose[5,k]=kurtosis(camadaSaidaPredict)
+    Resultados_Assim_Curtose[6,k]=skewness(camadaSaidaPredict)
+    Resultados_Assim_Curtose[7,k]=min(camadaSaidaPredict)
+    Resultados_Assim_Curtose[8,k]=max(camadaSaidaPredict)
 
 
     dev.off() ### Salvando gr?ficos do Ativo dentro Loop
@@ -932,6 +970,14 @@ _______________________________________________________
   colnames(TesteTPosPredict)= Test$Nomes
   TesteTPosPredict[1,]=Test$Prob
 
+###############################################################################
+  # Statistic Summary
+  ## Train NNet
+  order(as.matrix(Resultados_Assim_Curtose[1,]))
+  nomes = colnames(Resultados_Assim_Curtose)
+  prob = data.frame(t(Resultados_Assim_Curtose))
+  Summary_ANNt = arrange(prob, desc(Probability))
+
 
 
   ###
@@ -955,10 +1001,13 @@ _______________________________________________________
   T8=data.frame(TesteTPosPredict) #Res Prob. Dist t - RNA Particular Ordenada Test
 
 
-View(T8)
+#View(T8)
 
 Assets_ANNt_Order = T8
 rownames(Assets_ANNt_Order)='Probability'
+View(Assets_ANNt_Order)
+View(Summary_ANNt)
+print(Assets_ANNt_Order)
 save(Assets_ANNt_Order,file='~/Assets_ANNt_Order.rda')
 nome_asset_order= str_replace(Final_Date_Testing,"-","_")
 nome_asset_order= str_replace(nome_asset_order,"-","_")

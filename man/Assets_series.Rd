@@ -15,7 +15,7 @@ Assets_series(Tickers, RM, Initial_Date, Final_Date, Periodicity)
 
 Assets with values not observed in the series are excluded}
 
-\item{Final_Date}{Series end Date ('Year-Month-Day')}
+\item{Final_Date}{Series end Date ('Year-Month-Day'). If '' is the System Date}
 
 \item{Periodicity}{should be one of “daily”, “weekly”, “monthly”, “hourly”, “1minutes”, “2minutes”, “5minutes”, “15minutes”, “30minutes”, “60minutes”, “90minutes”. (Intraday maximum 7 days)}
 }
@@ -31,6 +31,6 @@ Final_Date <-c('2023-09-07')
 Periodicity <- c('daily')
 
 # Generates the Adjusted Daily Prices Series from Yahoo Finance
-Assets_series (Tickers=c('AAPL','GOOG','CCBG','XOM','TSLA'),'^GSPC', '2018-01-03', '2023-09-07','daily')
+Assets_series (Tickers=c('AAPL','GOOG','CCBG','XOM','TSLA'),'^GSPC', '2018-01-03', '','daily')
 
 }

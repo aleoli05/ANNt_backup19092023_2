@@ -5,7 +5,7 @@
 #' @param Initial_Date Series start Date, format ('Year-Month-Day')
 #'
 #' Assets with values not observed in the series are excluded
-#' @param Final_Date Series end Date ('Year-Month-Day')
+#' @param Final_Date Series end Date ('Year-Month-Day'). If '' is the System Date
 #' @param Periodicity should be one of “daily”, “weekly”, “monthly”, “hourly”, “1minutes”, “2minutes”, “5minutes”, “15minutes”, “30minutes”, “60minutes”, “90minutes”. (Intraday maximum 7 days)
 
 
@@ -18,10 +18,9 @@
 #' Periodicity <- c('daily')
 #'
 #' # Generates the Adjusted Daily Prices Series from Yahoo Finance
-#' Assets_series (Tickers=c('AAPL','GOOG','CCBG','XOM','TSLA'),'^GSPC', '2018-01-03', '2023-09-07','daily')
+#' Assets_series (Tickers=c('AAPL','GOOG','CCBG','XOM','TSLA'),'^GSPC', '2018-01-03', '','daily')
 #'
 Assets_series <- function(Tickers, RM, Initial_Date, Final_Date, Periodicity) {
-
 
   library(quantmod)
   library(PerformanceAnalytics)
@@ -54,7 +53,14 @@ Assets_series <- function(Tickers, RM, Initial_Date, Final_Date, Periodicity) {
   library(DEoptim)
 
   ################# Create Returns Times Series ###########################
+
+  if(Final_Date==('')){
+    Final_Date=Sys.Date()
+  }
+
+
   # RM
+
   RM <- RM
   Tickers_1=Tickers
   Condicao=Tickers
@@ -64,7 +70,7 @@ Assets_series <- function(Tickers, RM, Initial_Date, Final_Date, Periodicity) {
   #install.packages("rvest")
 
   library(rvest)
-
+  options(warn=-1)
   # get the URL for the wikipedia page with all SP500 symbols
   url <- "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
   # use that URL to scrape the SP500 table using rvest
