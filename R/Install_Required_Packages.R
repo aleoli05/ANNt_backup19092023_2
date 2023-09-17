@@ -2,8 +2,6 @@
 #' Install all necessary packages for required commands.
 #' @export
 #' @param () no required parameters
-
-
 #' @examples
 #' Install_required_packages()
 #'
@@ -40,7 +38,8 @@ Install_required_packages <- function() {
     install.packages("CVXR")
     install.packages("MFDFA")
     install.packages("DEoptim")
-    install.packages("rvest")
+    #install.packages("nse2r")
+    #library("nse2r")
     library("quantmod")
     library("PerformanceAnalytics")
     library("magrittr")
