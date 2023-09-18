@@ -1,25 +1,20 @@
-#' Generate return portfolios
-#'
+#' Gen_portfolios
 #' @export
-#' @param N_assets Number of assets at the ANNt and MF-DFA portfolios
-#' @param Initial_Date_Testing Initial date of the portfolios series
-#' @param Final_Date_Testing Final date of the portfolios series
-#' @param Rf Return of Risk free % (daily)
+#' @param N_Assets limit of asset numbers in the portfolio
+#' @param Initial_Date_Testing Initial Date of Test Series
+#' @param Final_Date_Testing Final Date Test Series
+#' @param Rf Risk free rate
+#'
 #' @examples
-#' N_assets <- 3
+#' N_Assets <- 5
 #' Initial_Date_Testing <- c('2023-01-03')
 #' Final_Date_Testing <- c('2023-09-07')
 #' Rf <- 0
 #'
-#' # Generate the portfolios ANNt,MF-DFA, Sharpe, and Marowitz
-#' Gen_portfolios(3, '2023-01-03', '',0)
+#' # Generate assets portfolio (maximum N assets specified)
+#' Gen_portfolios(5,'2023-01-03','',0)
 #'
-
-################################################################################
-###### Multifractal##############################################################
-################################################################################
-## End(Not run)
-Gen_portfolios <- function(N_assets, Initial_Date_Testing, Final_Date_Testing, Rf){
+Gen_portfolios <-function(N_Assets, Initial_Date_Testing, Final_Date_Testing, Rf){
 
   # Duração do processamento 1720/length(dados)=1.2 min)
   load("~/scenario.set.rda") # Carrega objeto scenario.set
@@ -43,13 +38,14 @@ Gen_portfolios <- function(N_assets, Initial_Date_Testing, Final_Date_Testing, R
 ___________________________________________________________________
 ", sep=""))
 
-  n_assets=N_assets
+  n_assets=N_Assets
 
   if(Initial_Date_Testing==('')){
     Initial_Date_Testing=I_dataPredict
   }
   if(Final_Date_Testing==('')){
-    Final_Date_Testing=rownames(nrow(dados2))
+    Final_Date_Testing=rownames(dados2[nrow(dados2),])
+    #Final_Date_Testing=Sys.Date()
   }
 
   Rf=Rf/100
@@ -166,7 +162,7 @@ ___________________________________________________________________
   Ret_C_MFractal = as.matrix(C_MFractal) %*% Pesos_MFractal
 
   # Carteira de Markovitz de Minima Variância M_Fractal
-  Pesos_MFractal_Mkv <- round(tseries::portfolio.optim(as.matrix(C_MFractal))$pw, 2)
+  Pesos_MFractal_Mkv <- round(tseries::portfolio.optim(as.matrix(C_MFractal))$pw, 4)
   Ret_C_MFractal = as.matrix(C_MFractal)%*% Pesos_MFractal_Mkv
 
   # Weight extract
@@ -187,7 +183,7 @@ ___________________________________________________________________
 
   # Carteira de Markovitz de Minima Variância obtida a partir de todos ativos
   TodosAtivosPredict = as.matrix(rbind(scenario.set[Datas1Predict,-1]))
-  pesos_todosPredict <- round(tseries::portfolio.optim(TodosAtivosPredict)$pw, 2)
+  pesos_todosPredict <- round(tseries::portfolio.optim(TodosAtivosPredict)$pw, 4)
   RetornoMedioMArkovitz = TodosAtivosPredict%*% pesos_todosPredict
   # Weight extract
   Carteira_Markov = data.frame(colnames(TodosAtivosPredict),pesos_todosPredict)
@@ -213,7 +209,7 @@ ___________________________________________________________________
   # Weight extract
   C_Pesos_Eq_ANNt= data.frame(colnames(C_Net_T_comparativa),PesosComparativos)
   Pesos_ANNt_Eq1 <- C_Pesos_Eq_ANNt[C_Pesos_Eq_ANNt[,2]>0,]
-  Pesos_ANNt_Eq2<- round(t(matrix(Pesos_ANNt_Eq1[,2])),2)
+  Pesos_ANNt_Eq2<- round(t(matrix(Pesos_ANNt_Eq1[,2])),4)
   colnames(Pesos_ANNt_Eq2) <- Pesos_ANNt_Eq1[,1]
   rownames(Pesos_ANNt_Eq2)<-'Weight'
   print(paste('[3] Weights of the ANNt_EQ Portfolio:'))
@@ -222,7 +218,7 @@ ___________________________________________________________________
 
   # Carteira RNA NNet dist T com pesos de Markovitz  para Comparação
   pesos_MarkovitzNNet_T <- round(tseries::portfolio.optim(
-    as.matrix(C_Net_T_comparativa))$pw, 2)
+    as.matrix(C_Net_T_comparativa))$pw, 4)
   Ret_Medio_RNA_T_Mkv = as.matrix(C_Net_T_comparativa) %*% pesos_MarkovitzNNet_T
 
   # Weight extract
@@ -569,5 +565,4 @@ ___________________________________________________________________
 
   View(Weights_All)
   View(Comparativo)
-
 }

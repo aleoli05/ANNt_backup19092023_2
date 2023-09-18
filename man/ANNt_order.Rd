@@ -2,11 +2,8 @@
 % Please edit documentation in R/ANNt_order.R
 \name{ANNt_order}
 \alias{ANNt_order}
-\title{ANNt_order
-, after import the assets, with the command Asset_series,
-classify assets by the probability of return exceeding a RM,
-using artificial neural networks and t-distribution.
-The number of input neurons is the number of assets generate in "Asset_series" command.}
+\title{classify assets by the probability of return exceeding a RM
+Use artificial neural networks and t-distribution, the number of input neurons is the number of import assets}
 \usage{
 ANNt_order(
   Initial_Date_Training,
@@ -26,11 +23,8 @@ ANNt_order(
 \item{Inicial_Date}{Series start Date (Must be 7 perios greater than the analyzed seriess)}
 }
 \description{
-ANNt_order
-, after import the assets, with the command Asset_series,
-classify assets by the probability of return exceeding a RM,
-using artificial neural networks and t-distribution.
-The number of input neurons is the number of assets generate in "Asset_series" command.
+classify assets by the probability of return exceeding a RM
+Use artificial neural networks and t-distribution, the number of input neurons is the number of import assets
 }
 \examples{
 Initial_Date_Training <-c('2018-01-11')

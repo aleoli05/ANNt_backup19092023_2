@@ -1,4 +1,4 @@
-#' Install_required_packages
+#' Install required packages
 #' Install all necessary packages for required commands.
 #' @export
 #' @param () no required parameters

@@ -1,4 +1,5 @@
-#' Import the series
+#' Assets series
+#' Import the series with the length specified
 #' @export
 #' @param Tickers Name of the assets or "Current_SP500_Tickers" for all S&P 500 assets
 #' @param RM Proxy of the market
@@ -325,7 +326,7 @@ if (x==1) {
   write_xlsx(portfolioPrices_Df, "~/Assets_Prices.xlsx")
   portfolio_observed2=data.frame(portfolio_observed)
   write_xlsx(portfolio_observed2, "~/Assets_Prices_Observed.xlsx")
-  scenario.set2=data.frame(scenario.set)
+  scenario.set2=data.frame(rownames(as.data.frame(scenario.set)),as.data.frame(scenario.set))
   write_xlsx(scenario.set2, "~/Assets_Returns.xlsx")
   write_xlsx(sp500tickers, "~/Current_SP500_Tickers.xlsx")
 

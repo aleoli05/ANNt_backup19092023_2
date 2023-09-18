@@ -2,29 +2,29 @@
 % Please edit documentation in R/Gen_portfolios.R
 \name{Gen_portfolios}
 \alias{Gen_portfolios}
-\title{Generate return portfolios}
+\title{Gen_portfolios}
 \usage{
-Gen_portfolios(N_assets, Initial_Date_Testing, Final_Date_Testing, Rf)
+Gen_portfolios(N_Assets, Initial_Date_Testing, Final_Date_Testing, Rf)
 }
 \arguments{
-\item{N_assets}{Number of assets at the ANNt and MF-DFA portfolios}
+\item{N_Assets}{limit of asset numbers in the portfolio}
 
-\item{Initial_Date_Testing}{Initial date of the portfolios series}
+\item{Initial_Date_Testing}{Initial Date of Test Series}
 
-\item{Final_Date_Testing}{Final date of the portfolios series}
+\item{Final_Date_Testing}{Final Date Test Series}
 
-\item{Rf}{Return of Risk free % (daily)}
+\item{Rf}{Risk free rate}
 }
 \description{
-Generate return portfolios
+Gen_portfolios
 }
 \examples{
-N_assets <- 3
+N_Assets <- 5
 Initial_Date_Testing <- c('2023-01-03')
 Final_Date_Testing <- c('2023-09-07')
 Rf <- 0
 
-# Generate the portfolios ANNt,MF-DFA, Sharpe, and Marowitz
-Gen_portfolios(3, '2023-01-03', '',0)
+# Generate assets portfolio (maximum N assets specified)
+Gen_portfolios(5,'2023-01-03','',0)
 
 }

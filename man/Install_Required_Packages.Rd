@@ -2,7 +2,7 @@
 % Please edit documentation in R/Install_required_packages.R
 \name{Install_required_packages}
 \alias{Install_required_packages}
-\title{Install_required_packages
+\title{Install required packages
 Install all necessary packages for required commands.}
 \usage{
 Install_required_packages()
@@ -11,7 +11,7 @@ Install_required_packages()
 \item{()}{no required parameters}
 }
 \description{
-Install_required_packages
+Install required packages
 Install all necessary packages for required commands.
 }
 \examples{

@@ -2,7 +2,8 @@
 % Please edit documentation in R/Assets_series.R
 \name{Assets_series}
 \alias{Assets_series}
-\title{Import the series}
+\title{Assets series
+Import the series with the length specified}
 \usage{
 Assets_series(Tickers, RM, Initial_Date, Final_Date, Periodicity)
 }
@@ -20,7 +21,8 @@ Assets with values not observed in the series are excluded}
 \item{Periodicity}{should be one of “daily”, “weekly”, “monthly”, “hourly”, “1minutes”, “2minutes”, “5minutes”, “15minutes”, “30minutes”, “60minutes”, “90minutes”. (Intraday maximum 7 days)}
 }
 \description{
-Import the series
+Assets series
+Import the series with the length specified
 }
 \examples{
 # Specify the assets or "Current_SP500_Tickers" for all S&P 500 assets

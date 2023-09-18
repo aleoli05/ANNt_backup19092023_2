@@ -1,21 +1,20 @@
-#' ANNt_order
-#' , after import the assets, with the command Asset_series,
-#' classify assets by the probability of return exceeding a RM,
-#' using artificial neural networks and t-distribution.
-#' The number of input neurons is the number of assets generate in "Asset_series" command.
+#' classify assets by the probability of return exceeding a RM
+#' Use artificial neural networks and t-distribution, the number of input neurons is the number of import assets
+
 #' @export
 #' @param Inicial_Date Series start Date (Must be 7 perios greater than the analyzed seriess)
 # @param Date_Training Series finish training date
 #' @param Final_Date_Training Series end Date (If '' is the System Date)
 #' @param Hidden Number of hidden neurons (If '' is the length series)
 #' @param Stepmax Number of replications per asset to train the ANN
+
 #' @examples
 #' Initial_Date_Training <-c('2018-01-11')
 #' Final_Date_Training <- c('2022-12-29')
 #' Final_Date_Testing <-c('2023-09-07')
 #' Hidden <- 5
 #' Stepmax <- 2500
-#' ANNt_order ('2018-01-11','2022-12-29','2023-09-07', 5, 2500)
+#' ANNt_order ('2018-01-11','2022-12-29','', 5, 2500)
 #' # Estimated processing time 30 minutes per asset
 #'
 #Portfolio optimization system using Artificial Neural Networks.
@@ -47,12 +46,12 @@ ANNt_order <- function(Initial_Date_Training, Final_Date_Training, Final_Date_Te
  }
  # Duração do processamento 285.4/length(dados=0.2 horas)
 
- Fator_Tempo = 1200/nrow(dados)*Cont1/(nrow(dados)-5)*Stepmax/2500
+ Fator_Tempo = (12000/nrow(dados))*(Cont1/(nrow(dados)-5))*Stepmax/2500
  Unidade=' minute(s)'
  Tempo= round(Fator_Tempo*(ncol((dados))-1),2)
  if (Tempo>120){
    Unidade=' hour(s)'
-   Tempo=Tempo/60
+   Tempo=round(Tempo/60,2)
  }
  dados2=data.frame(dados)
  cat(paste("
@@ -229,7 +228,9 @@ ___________________________________________________________________
 
     if(Hidden %% 2 == 0) {
       escondida = Hidden
-      } else {escondida =Hidden+1}
+    } else {if(Hidden >15){
+        escondida =Hidden+1
+        } else {escondida = Hidden}}
     nnplot= neuralnet( ATIVO ~ RM + V3 + V4 + V5 + V6 + V7, data=entradas,
                        hidden = escondida, act.fct = "tanh", threshold = 0.1,
                        stepmax=epocas)
@@ -716,7 +717,7 @@ ___________________________________________________________________
     #png(file = "leptokurtic.png")
 
     if (kurtosis(camadaSaidaPredict)>3) {
-      ku=kurtosis(camadaSaidaPredict)
+      ku=round(kurtosis(camadaSaidaPredict),2)
       print(paste("Leptokurtic curve kurtosis:", ku))
       #print(ku)
     }
@@ -1009,9 +1010,13 @@ View(Assets_ANNt_Order)
 View(Summary_ANNt)
 print(Assets_ANNt_Order)
 save(Assets_ANNt_Order,file='~/Assets_ANNt_Order.rda')
-nome_asset_order= str_replace(Final_Date_Testing,"-","_")
-nome_asset_order= str_replace(nome_asset_order,"-","_")
-nome_asset_order=paste("~/Assets_ANNt_Order_",nome_asset_order,".xlsx", sep="")
+nome_asset= str_replace(Final_Date_Testing,"-","_")
+nome_asset= str_replace(nome_asset,"-","_")
+nome_Asset_order=paste("~/Assets_ANNt_Order_",nome_asset,".xlsx", sep="")
+nome_Summary_ANNt=paste("~/Summary_ANNt_",nome_asset,".xlsx", sep="")
+  save(I_dataPredict,file='~/I_dataPredict.rda')
+  save(F_dataPredict,file='~/F_dataPredict.rda')
+  save(Summary_ANNt,file='~/Summary_ANNt.rda')
   save(T1,file='~/T1.rda')
   save(T2,file='~/T2.rda')
   save(T3,file='~/T3.rda')
@@ -1020,6 +1025,13 @@ nome_asset_order=paste("~/Assets_ANNt_Order_",nome_asset_order,".xlsx", sep="")
   save(T6,file='~/T6.rda')
   save(T7,file='~/T7.rda')
   save(T8,file='~/T8.rda')
-write_xlsx(Assets_ANNt_Order, nome_asset_order)
+
+write_xlsx(Assets_ANNt_Order, nome_Asset_order)
+
+Summary_ANNt_xls=data.frame(rownames(Summary_ANNt),Summary_ANNt)
+names2=colnames(Summary_ANNt_xls)
+names2[1]='Ticker'
+colnames(Summary_ANNt_xls)<-names2
+write_xlsx(Summary_ANNt_xls, nome_Summary_ANNt)
   ###############################
 }
