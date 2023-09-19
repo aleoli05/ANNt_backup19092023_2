@@ -39,6 +39,8 @@ Install_required_packages <- function() {
     install.packages("MFDFA")
     install.packages("DEoptim")
     #install.packages("nse2r")
+    install.packages('var')
+    install.packages('cvar')
     #library("nse2r")
     library("quantmod")
     library("PerformanceAnalytics")
@@ -70,6 +72,8 @@ Install_required_packages <- function() {
     library("MFDFA")
     library("DEoptim")
     library("rvest")
+    library("var")
+    library("cvar")
 
   x="All installed and loaded"
   print(x)

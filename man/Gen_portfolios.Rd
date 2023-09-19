@@ -19,12 +19,12 @@ Gen_portfolios(N_Assets, Initial_Date_Testing, Final_Date_Testing, Rf)
 Gen_portfolios
 }
 \examples{
-N_Assets <- 5
+N_Assets <- 3
 Initial_Date_Testing <- c('2023-01-03')
 Final_Date_Testing <- c('2023-09-07')
 Rf <- 0
 
 # Generate assets portfolio (maximum N assets specified)
-Gen_portfolios(5,'2023-01-03','',0)
+Gen_portfolios(3,'2023-01-03','',0)
 
 }

@@ -6,13 +6,13 @@
 #' @param Rf Risk free rate
 #'
 #' @examples
-#' N_Assets <- 5
+#' N_Assets <- 3
 #' Initial_Date_Testing <- c('2023-01-03')
 #' Final_Date_Testing <- c('2023-09-07')
 #' Rf <- 0
 #'
 #' # Generate assets portfolio (maximum N assets specified)
-#' Gen_portfolios(5,'2023-01-03','',0)
+#' Gen_portfolios(3,'2023-01-03','',0)
 #'
 Gen_portfolios <-function(N_Assets, Initial_Date_Testing, Final_Date_Testing, Rf){
 
@@ -465,20 +465,26 @@ ___________________________________________________________________
   #############################################################################
 
   # Geração da Matriz de comparação dos Retornos
-  Comparativo_RETORNOS = matrix(nrow=length(Ret_C_MFractal), ncol=5)
-  Comparativo_RETORNOS[,1] = Ret_C_MFractal
-  Comparativo_RETORNOS[,2] = PosCovidSP500
-  Comparativo_RETORNOS[,3] = Media_C_Net_T_Comparativa
-  Comparativo_RETORNOS[,4] = RetornoMedioMArkovitz
-  Comparativo_RETORNOS[,5] = Ret_Medio_RNA_T_Mkv
+  RM <- colnames(scenario.set[1])
+  Comparativo_RETORNOS = matrix(nrow=length(Ret_C_MFractal), ncol=8)
+  Comparativo_RETORNOS[,1] = PosCovidSP500
+  Comparativo_RETORNOS[,2] = RetornoMedioMArkovitz
+  Comparativo_RETORNOS[,3] = RetornoMedioMaxIS
+  Comparativo_RETORNOS[,4] = Ret_C_MFractal
+  Comparativo_RETORNOS[,5] = RetornoMedioMaxIS_MFractal
+  Comparativo_RETORNOS[,6] = Media_C_Net_T_Comparativa
+  Comparativo_RETORNOS[,7] = Ret_Medio_RNA_T_Mkv
+  Comparativo_RETORNOS[,8] = RetornoMedioMaxIS_RNAt
+
   #Comparativo_RETORNOS[,6] = RetornoMedioMean_Variance_Mkv
-  colnames(Comparativo_RETORNOS)= c("MF-DFA_Mkw","SP500", "RNAt_Eq", "Markowitz", "RNAt_Mkw")
+  colnames(Comparativo_RETORNOS)= c(RM,"MARKOWITZ", "SHARPE", "MF_MKW", "MF_SHARPE",
+                                    "ANNt_EQ", "ANNt_MKW", "ANNt_SHARPE")
   rownames(Comparativo_RETORNOS) = rownames(PosCovidSP500)
   Datas_Comparativo_RETORNOS = rownames(as.data.frame(Comparativo_RETORNOS))
   Comparativos_RETORNOS_Df = mutate(as.data.frame(Datas_Comparativo_RETORNOS),
                                     as.data.frame(Comparativo_RETORNOS))
   View(Comparativo_RETORNOS)
-  save(Comparativo_RETORNOS,file='~/Comparativos_RETORNOS.rda')
+  save(Comparativo_RETORNOS,file='~/Comparativo_RETORNOS.rda')
   write_xlsx(Comparativos_RETORNOS_Df, "~/RetornosRNAxMF_DFA.xlsx")
 
   options(warn=-1)
@@ -512,12 +518,13 @@ ___________________________________________________________________
     Comparativo[i,8] = (as.matrix(Comparativo[i-1,8])+1)*
       (as.matrix(RetornoMedioMaxIS_RNAt[i,])+1)-1
   }
-  RM <- colnames(scenario.set[1])
+
   colnames(Comparativo)= c(RM,"MARKOWITZ", "SHARPE", "MF_MKW", "MF_SHARPE",
                            "ANNt_EQ", "ANNt_MKW", "ANNt_SHARPE")
   rownames(Comparativo) = rownames(as.data.frame(PosCovidSP500))
 
   save(Comparativo,file='~/Comparativo.rda')
+  save(Rf,file='~/Rf.rda')
   write_xlsx(as.data.frame(Comparativo), "~/Comparativo_MF_DFA_Sharpe.xlsx")
 
   #### Matrix of weights
@@ -564,5 +571,7 @@ ___________________________________________________________________
   write_xlsx(as.data.frame(Weights_All), "~/Weights_All.xlsx")
 
   View(Weights_All)
-  View(Comparativo)
+  View(Comparativo_RETORNOS)
+
+
 }
